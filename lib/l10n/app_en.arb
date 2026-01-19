@@ -75,5 +75,6 @@
   "thisWeek": "This Week",
   "today": "Today",
   "revenue": "Revenue",
-  "sold": "Sold"
+  "sold": "Sold",
+  "orders": "Orders"
 }
