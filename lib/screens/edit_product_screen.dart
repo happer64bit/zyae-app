@@ -319,7 +319,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ),
             const SizedBox(height: 8),
             if (_imagePath == null)
-              Center(child: Text(l10n.pickImage)),
+              Center(child: Text('${l10n.pickImage} ${l10n.optional}')),
             const SizedBox(height: 32),
             _buildLabel('${l10n.productName} *'),
             const SizedBox(height: 8),
