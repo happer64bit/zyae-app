@@ -61,7 +61,6 @@ class StatCard extends StatelessWidget {
                     subtitle!,
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: FontWeight.bold,
                       color: Colors.grey[600],
                     ),
                   ),
