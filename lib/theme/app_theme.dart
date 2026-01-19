@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFFD96D2B); // Orange from screenshot
@@ -42,7 +43,11 @@ class AppTheme {
           side: const BorderSide(color: Color(0xFFEEEEEE)),
         ),
       ),
-      fontFamily: 'Roboto', // Default, but good to be explicit if we add fonts later
+      fontFamily: GoogleFonts.poppins().fontFamily,
+      textTheme: GoogleFonts.poppinsTextTheme().apply(
+        bodyColor: textPrimary,
+        displayColor: textPrimary,
+      ),
     );
   }
 }
