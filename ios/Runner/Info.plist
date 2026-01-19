@@ -45,6 +45,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan barcodes for products.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to pick product images.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access for video features.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
