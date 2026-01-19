@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zyae/cubits/suppliers/suppliers_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
-import 'package:zyae/models/app_state.dart';
 import 'package:zyae/models/supplier.dart';
 import 'package:zyae/screens/edit_supplier_screen.dart';
 
@@ -10,17 +11,29 @@ class SuppliersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final suppliers = appState.suppliers;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.contacts),
       ),
-      body: suppliers.isEmpty
-          ? Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added'))) // Hacky fallback or just empty
-          : ListView.builder(
+      body: BlocBuilder<SuppliersCubit, SuppliersState>(
+        builder: (context, state) {
+          if (state is SuppliersLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (state is SuppliersError) {
+            return Center(child: Text('Error: ${state.message}'));
+          }
+
+          if (state is SuppliersLoaded) {
+            final suppliers = state.suppliers;
+            if (suppliers.isEmpty) {
+              return Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added')));
+            }
+
+            return ListView.builder(
               itemCount: suppliers.length,
               itemBuilder: (context, index) {
                 final supplier = suppliers[index];
@@ -35,43 +48,47 @@ class SuppliersScreen extends StatelessWidget {
                   ),
                   title: Text(supplier.name),
                   subtitle: supplier.phoneNumber != null ? Text(supplier.phoneNumber!) : null,
-                  onTap: () => _editSupplier(context, appState, supplier),
+                  onTap: () => _editSupplier(context, supplier),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deleteSupplier(context, appState, supplier),
+                    onPressed: () => _deleteSupplier(context, supplier),
                   ),
                 );
               },
-            ),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _addSupplier(context, appState),
+        onPressed: () => _addSupplier(context),
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Future<void> _addSupplier(BuildContext context, AppState appState) async {
+  Future<void> _addSupplier(BuildContext context) async {
     final result = await Navigator.push<Supplier>(
       context,
       MaterialPageRoute(builder: (context) => const EditSupplierScreen()),
     );
-    if (result != null) {
-      await appState.addSupplier(result);
+    if (result != null && context.mounted) {
+      context.read<SuppliersCubit>().addSupplier(result);
     }
   }
 
-  Future<void> _editSupplier(BuildContext context, AppState appState, Supplier supplier) async {
+  Future<void> _editSupplier(BuildContext context, Supplier supplier) async {
     final result = await Navigator.push<Supplier>(
       context,
       MaterialPageRoute(builder: (context) => EditSupplierScreen(supplier: supplier)),
     );
-    if (result != null) {
-      await appState.updateSupplier(result);
+    if (result != null && context.mounted) {
+      context.read<SuppliersCubit>().updateSupplier(result);
     }
   }
 
-  Future<void> _deleteSupplier(BuildContext context, AppState appState, Supplier supplier) async {
-    // Simple delete for now
-    await appState.deleteSupplier(supplier.id);
+  Future<void> _deleteSupplier(BuildContext context, Supplier supplier) async {
+    context.read<SuppliersCubit>().deleteSupplier(supplier.id);
   }
 }

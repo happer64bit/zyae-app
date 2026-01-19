@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:zyae/cubits/inventory/inventory_cubit.dart';
+import 'package:zyae/cubits/suppliers/suppliers_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:zyae/models/app_state.dart';
 import 'package:zyae/models/product.dart';
+import 'package:zyae/screens/barcode_scanner_screen.dart';
 import 'package:zyae/screens/edit_supplier_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
 
@@ -102,8 +104,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  Future<void> _selectSupplier(AppState appState) async {
+  Future<void> _selectSupplier() async {
     final l10n = AppLocalizations.of(context)!;
+    final suppliersCubit = context.read<SuppliersCubit>();
+    
+    // Ensure suppliers are loaded
+    if (suppliersCubit.state is! SuppliersLoaded) {
+      await suppliersCubit.loadSuppliers();
+    }
+
+    if (!mounted) return;
+
     final selectedSupplier = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -117,62 +128,73 @@ class _EditProductScreenState extends State<EditProductScreen> {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.selectContact,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+            return BlocBuilder<SuppliersCubit, SuppliersState>(
+              builder: (context, state) {
+                if (state is SuppliersLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                
+                final suppliers = state is SuppliersLoaded ? state.suppliers : [];
+
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n.selectContact,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle, color: AppTheme.primaryColor),
+                            onPressed: () async {
+                              final cubit = context.read<SuppliersCubit>();
+                              final newSupplier = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditSupplierScreen()),
+                              );
+                              if (newSupplier != null) {
+                                await cubit.addSupplier(newSupplier);
+                                if (!context.mounted) return;
+                                Navigator.pop(context, newSupplier.name);
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.add_circle, color: AppTheme.primaryColor),
-                        onPressed: () async {
-                          final newSupplier = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const EditSupplierScreen()),
-                          );
-                          if (newSupplier != null) {
-                            await appState.addSupplier(newSupplier);
-                            if (!context.mounted) return;
-                            Navigator.pop(context, newSupplier.name);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: appState.suppliers.isEmpty
-                      ? Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added')))
-                      : ListView.builder(
-                          controller: scrollController,
-                          itemCount: appState.suppliers.length,
-                          itemBuilder: (context, index) {
-                            final supplier = appState.suppliers[index];
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: supplier.imagePath != null
-                                    ? FileImage(File(supplier.imagePath!))
-                                    : null,
-                                child: supplier.imagePath == null
-                                    ? Text(supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?')
-                                    : null,
-                              ),
-                              title: Text(supplier.name),
-                              subtitle: supplier.phoneNumber != null ? Text(supplier.phoneNumber!) : null,
-                              onTap: () => Navigator.pop(context, supplier.name),
-                            );
-                          },
-                        ),
-                ),
-              ],
+                    ),
+                    Expanded(
+                      child: suppliers.isEmpty
+                          ? Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added')))
+                          : ListView.builder(
+                              controller: scrollController,
+                              itemCount: suppliers.length,
+                              itemBuilder: (context, index) {
+                                final supplier = suppliers[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: supplier.imagePath != null
+                                        ? FileImage(File(supplier.imagePath!))
+                                        : null,
+                                    child: supplier.imagePath == null
+                                        ? Text(supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?')
+                                        : null,
+                                  ),
+                                  title: Text(supplier.name),
+                                  subtitle: supplier.phoneNumber != null ? Text(supplier.phoneNumber!) : null,
+                                  onTap: () => Navigator.pop(context, supplier.name),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                );
+              },
             );
           },
         );
@@ -186,7 +208,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveProduct(AppState appState) {
+  void _saveProduct() {
     final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     if (name.isEmpty) {
@@ -215,7 +237,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         expiryDate: _expiryDate,
         imagePath: _imagePath,
       );
-      appState.addProduct(newProduct);
+      context.read<InventoryCubit>().addProduct(newProduct);
     } else {
       final updated = widget.product!.copyWith(
         name: name,
@@ -228,25 +250,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
         expiryDate: _expiryDate,
         imagePath: _imagePath,
       );
-      appState.updateProduct(updated);
+      context.read<InventoryCubit>().updateProduct(updated);
     }
 
     Navigator.pop(context);
   }
 
-  void _deleteProduct(AppState appState) {
+  void _deleteProduct() {
     final product = widget.product;
     if (product == null) {
       Navigator.pop(context);
       return;
     }
-    appState.deleteProduct(product.id);
+    context.read<InventoryCubit>().deleteProduct(product.id);
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -273,7 +294,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: Text(l10n.cancel),
                       ),
                       TextButton(
-                        onPressed: () => _deleteProduct(appState),
+                        onPressed: () => _deleteProduct(),
                         child: Text(
                           l10n.delete,
                           style: const TextStyle(color: Colors.red),
@@ -344,7 +365,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            _buildLabel('${l10n.sellingPrice} (₹) *'),
+            _buildLabel('${l10n.sellingPrice} (MMK) *'),
             const SizedBox(height: 8),
             _buildTextField(
               _priceController,
@@ -472,14 +493,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
               keyboardType: TextInputType.phone,
               hintText: l10n.optional,
               readOnly: true,
-              onTap: () => _selectSupplier(appState),
+              onTap: _selectSupplier,
             ),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () => _saveProduct(appState),
+                onPressed: _saveProduct,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
                   foregroundColor: Colors.white,
@@ -547,28 +568,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      ),
-    );
-  }
-}
-
-class BarcodeScannerScreen extends StatelessWidget {
-  const BarcodeScannerScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.scanBarcode)),
-      body: MobileScanner(
-        onDetect: (capture) {
-          final List<Barcode> barcodes = capture.barcodes;
-          for (final barcode in barcodes) {
-            if (barcode.rawValue != null) {
-              Navigator.pop(context, barcode.rawValue);
-              break;
-            }
-          }
-        },
       ),
     );
   }

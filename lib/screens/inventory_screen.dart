@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zyae/models/app_state.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/product_grid_item.dart';
 import 'package:zyae/widgets/product_list_item.dart';
 
 class InventoryScreen extends StatefulWidget {
@@ -51,92 +53,131 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
+    final inventoryState = context.watch<InventoryCubit>().state;
     final l10n = AppLocalizations.of(context)!;
-    final products = appState.products;
+    final products = inventoryState.products;
     final filtered = _filteredProducts(products);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Column(
           children: [
-            Text(l10n.inventory),
-            Text(
-              '${products.length} ${l10n.items}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.inventory,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${products.length} ${l10n.items}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
+                    onPressed: () {
+                      context.push('/edit-product');
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: l10n.searchProducts,
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _buildFilterChip('All', l10n.all),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Low Stock', l10n.lowStock),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Out of Stock', l10n.outOfStock),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('In Stock', l10n.inStock),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 600) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final product = filtered[index];
+                        return ProductListItem(
+                          product: product,
+                          onTap: () {
+                            context.push('/edit-product', extra: product);
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200,
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final product = filtered[index];
+                        return ProductGridItem(
+                          product: product,
+                          onTap: () {
+                            context.push('/edit-product', extra: product);
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              context.push('/edit-product');
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: l10n.searchProducts,
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              ),
-              onChanged: (value) => setState(() {}),
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _buildFilterChip('All', l10n.all),
-                const SizedBox(width: 8),
-                _buildFilterChip('Low Stock', l10n.lowStock),
-                const SizedBox(width: 8),
-                _buildFilterChip('Out of Stock', l10n.outOfStock),
-                const SizedBox(width: 8),
-                _buildFilterChip('In Stock', l10n.inStock),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filtered.length,
-              itemBuilder: (context, index) {
-                final product = filtered[index];
-                return ProductListItem(
-                  product: product,
-                  onTap: () {
-                    context.push('/edit-product', extra: product);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

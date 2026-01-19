@@ -51,7 +51,7 @@ class ProductGridItem extends StatelessWidget {
               if (product.imagePath == null) const Spacer(),
               const SizedBox(height: 4),
               Text(
-                '₹${product.price.toStringAsFixed(0)}',
+                '${product.price.toStringAsFixed(0)} MMK',
                 style: const TextStyle(
                   color: AppTheme.primaryColor, // Orange price in screenshot
                   fontWeight: FontWeight.bold,

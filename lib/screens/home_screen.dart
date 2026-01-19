@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zyae/cubits/inventory/inventory_cubit.dart';
+import 'package:zyae/cubits/sales/sales_cubit.dart';
+import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:zyae/models/app_state.dart';
 import 'package:zyae/screens/inventory_screen.dart';
 import 'package:zyae/screens/sales_screen.dart';
 import 'package:zyae/screens/sell_screen.dart';
@@ -31,14 +34,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final lowStockProducts = appState.lowStockProducts;
+    final inventoryState = context.watch<InventoryCubit>().state;
+    final salesState = context.watch<SalesCubit>().state;
+    final settingsState = context.watch<SettingsCubit>().state;
+
+    final lowStockProducts = inventoryState.lowStockProducts;
     final today = DateTime.now();
 
     double todaysSales = 0;
     var todaysTransactions = 0;
-    for (final sale in appState.sales) {
+    for (final sale in salesState.sales) {
       final sameDay = sale.date.year == today.year &&
           sale.date.month == today.month &&
           sale.date.day == today.day;
@@ -49,47 +55,66 @@ class HomeScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Column(
           children: [
-            Text(l10n.appTitle),
-            Text(
-              _formatDate(today, appState.locale.languageCode),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.appTitle,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _formatDate(today, settingsState.locale.languageCode),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _buildSectionTitle(l10n.todaysOverview),
+            Expanded(
+              child: Stack(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    children: [
+                      _buildSectionTitle(l10n.todaysOverview),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  StatCard(
-                    title: l10n.todaysSales,
-                    value: '\$${todaysSales.toStringAsFixed(0)}', // Use $ for generic currency or make it configurable
-                    icon: Icons.attach_money,
-                    iconColor: AppTheme.successColor,
-                    iconBgColor: AppTheme.successBg,
-                    backgroundColor:
-                        AppTheme.successBg.withValues(alpha: 0.5),
+                  Expanded(
+                    child: StatCard(
+                      title: l10n.todaysSales,
+                      value: '${todaysSales.toStringAsFixed(0)} MMK',
+                      icon: Icons.attach_money,
+                      iconColor: AppTheme.successColor,
+                      iconBgColor: AppTheme.successBg,
+                      backgroundColor:
+                          AppTheme.successBg.withValues(alpha: 0.5),
+                    ),
                   ),
                   const SizedBox(width: 16),
-                  StatCard(
-                    title: l10n.transactions,
-                    value: todaysTransactions.toString(),
-                    icon: Icons.shopping_bag_outlined,
-                    iconColor: AppTheme.warningColor,
-                    iconBgColor: AppTheme.warningBg,
+                  Expanded(
+                    child: StatCard(
+                      title: l10n.transactions,
+                      value: todaysTransactions.toString(),
+                      icon: Icons.shopping_bag_outlined,
+                      iconColor: AppTheme.warningColor,
+                      iconBgColor: AppTheme.warningBg,
+                    ),
                   ),
                 ],
               ),
@@ -240,6 +265,10 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+            ),
+          ],
+        ),
       ),
     );
   }

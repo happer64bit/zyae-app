@@ -52,9 +52,14 @@ class ProductListItem extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'Qty: ${product.quantity.toStringAsFixed(0)} ${product.unit}',
@@ -63,7 +68,6 @@ class ProductListItem extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(width: 8),
                         if (product.isLowStock)
                           _buildStatusTag(
                             'Low stock',
@@ -94,7 +98,7 @@ class ProductListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '₹${product.price.toStringAsFixed(0)}',
+                    '${product.price.toStringAsFixed(0)} MMK',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

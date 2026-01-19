@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zyae/cubits/cart/cart_cubit.dart';
+import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
-import 'package:zyae/models/app_state.dart';
 import 'package:zyae/models/product.dart';
-import 'package:zyae/screens/edit_product_screen.dart';
-import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/screens/barcode_scanner_screen.dart';
+import 'package:zyae/widgets/cart_bottom_sheet.dart';
 import 'package:zyae/widgets/product_grid_item.dart';
+import 'package:zyae/widgets/product_list_item.dart';
 
 class SellScreen extends StatefulWidget {
   const SellScreen({super.key});
@@ -14,7 +17,6 @@ class SellScreen extends StatefulWidget {
 }
 
 class _SellScreenState extends State<SellScreen> {
-  final Map<String, int> _cart = {};
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -23,7 +25,7 @@ class _SellScreenState extends State<SellScreen> {
     super.dispose();
   }
 
-  Future<void> _scanBarcode(AppState appState) async {
+  Future<void> _scanBarcode() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
@@ -34,13 +36,14 @@ class _SellScreenState extends State<SellScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     if (result is String) {
-      final product = appState.products.cast<Product?>().firstWhere(
+      final products = context.read<InventoryCubit>().state.products;
+      final product = products.cast<Product?>().firstWhere(
         (p) => p?.barcode == result,
         orElse: () => null,
       );
       
       if (product != null) {
-        _addToCart(product);
+        context.read<CartCubit>().addToCart(product);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${product.name} ${l10n.addedToCart}')),
         );
@@ -65,15 +68,9 @@ class _SellScreenState extends State<SellScreen> {
         .toList();
   }
 
-  void _addToCart(Product product) {
-    setState(() {
-      _cart[product.id] = (_cart[product.id] ?? 0) + 1;
-    });
-  }
-
-  double _totalAmount(List<Product> allProducts) {
+  double _totalAmount(Map<String, int> cartItems, List<Product> allProducts) {
     var total = 0.0;
-    _cart.forEach((productId, quantity) {
+    cartItems.forEach((productId, quantity) {
       final product =
           allProducts.firstWhere((p) => p.id == productId, orElse: () => allProducts.first);
       total += product.price * quantity;
@@ -81,20 +78,19 @@ class _SellScreenState extends State<SellScreen> {
     return total;
   }
 
-  int get _totalItems {
+  int _totalItems(Map<String, int> cartItems) {
     var total = 0;
-    _cart.forEach((_, quantity) {
+    cartItems.forEach((_, quantity) {
       total += quantity;
     });
     return total;
   }
 
-  void _showCartSheet(AppState appState, List<Product> allProducts) {
-    if (_cart.isEmpty) {
+  void _showCartSheet(BuildContext context, List<Product> allProducts) {
+    final cartCubit = context.read<CartCubit>();
+    if (cartCubit.state.items.isEmpty) {
       return;
     }
-
-    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
       context: context,
@@ -102,257 +98,125 @@ class _SellScreenState extends State<SellScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        final entries = _cart.entries.toList();
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 50,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.cart,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    final entry = entries[index];
-                    final product = allProducts.firstWhere(
-                      (p) => p.id == entry.key,
-                    );
-                    final lineTotal = product.price * entry.value;
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(product.name),
-                      subtitle: Text(
-                        '${entry.value} x ₹${product.price.toStringAsFixed(0)}',
-                      ),
-                      trailing: Text(
-                        '₹${lineTotal.toStringAsFixed(0)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Total ($_totalItems items)',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    '₹${_totalAmount(allProducts).toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () {
-                    appState.completeSale(_cart);
-                    setState(() {
-                      _cart.clear();
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.saleCompleted),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Text(
-                    'Complete Sale',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return CartBottomSheet(allProducts: allProducts);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
-    final products = appState.products;
-    final filtered = _filteredProducts(products);
+    final inventoryState = context.watch<InventoryCubit>().state;
+    final cartState = context.watch<CartCubit>().state;
+    final allProducts = inventoryState.products;
+    final products = _filteredProducts(allProducts);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Column(
           children: [
-            Text('New Sale'),
-            Text(
-              'Tap to add items',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'New Sale',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Tap to add items',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: _scanBarcode,
+                    icon: const Icon(Icons.qr_code_scanner, size: 28),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search products...',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 600) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return ProductListItem(
+                          product: product,
+                          onTap: () => context.read<CartCubit>().addToCart(product),
+                        );
+                      },
+                    );
+                  } else {
+                    return GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200,
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return ProductGridItem(
+                          product: product,
+                          onTap: () => context.read<CartCubit>().addToCart(product),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () => _scanBarcode(appState),
-            icon: const Icon(Icons.qr_code_scanner),
-          ),
-        ],
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search products...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  ),
-                  onChanged: (value) => setState(() {}),
-                ),
-              ),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.5,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final product = filtered[index];
-                    return ProductGridItem(
-                      product: product,
-                      onTap: () => _addToCart(product),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          if (_cart.isNotEmpty)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: GestureDetector(
-                onTap: () => _showCartSheet(appState, products),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child:
-                            const Icon(Icons.shopping_cart, color: Colors.white),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$_totalItems items',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            '₹${_totalAmount(products).toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Text(
-                        'View Cart',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      floatingActionButton: cartState.items.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () => _showCartSheet(context, allProducts),
+              label: Text(
+                  '${_totalItems(cartState.items)} items = ${_totalAmount(cartState.items, allProducts).toStringAsFixed(0)} MMK'),
+              icon: const Icon(Icons.shopping_cart),
+            )
+          : null,
     );
   }
 }

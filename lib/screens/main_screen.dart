@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zyae/models/app_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/theme/app_theme.dart';
 
 class MainScreen extends StatefulWidget {
@@ -26,13 +27,13 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _checkFirstLaunch() {
-    final appState = AppStateScope.of(context);
-    if (appState.isFirstLaunch) {
-      _showLanguagePicker(appState);
+    final settingsCubit = context.read<SettingsCubit>();
+    if (settingsCubit.state.isFirstLaunch) {
+      _showLanguagePicker(settingsCubit);
     }
   }
 
-  void _showLanguagePicker(AppState appState) {
+  void _showLanguagePicker(SettingsCubit settingsCubit) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -46,16 +47,16 @@ class _MainScreenState extends State<MainScreen> {
               ListTile(
                 title: const Text('English'),
                 onTap: () {
-                  appState.setLocale(const Locale('en'));
-                  appState.completeFirstLaunch();
+                  settingsCubit.setLocale(const Locale('en'));
+                  settingsCubit.completeFirstLaunch();
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: const Text('Burmese (မြန်မာ)'),
                 onTap: () {
-                  appState.setLocale(const Locale('my'));
-                  appState.completeFirstLaunch();
+                  settingsCubit.setLocale(const Locale('my'));
+                  settingsCubit.completeFirstLaunch();
                   Navigator.pop(context);
                 },
               ),
@@ -89,23 +90,27 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ],
         ),
-        child: NavigationBar(
-          elevation: 0,
+        child: BottomNavigationBar(
+          currentIndex: widget.navigationShell.currentIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
-          selectedIndex: widget.navigationShell.currentIndex,
-          onDestinationSelected: _onItemTapped,
-          destinations: [
-            NavigationDestination(
+          selectedItemColor: AppTheme.primaryColor,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
               icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
+              activeIcon: const Icon(Icons.home),
               label: l10n.home,
             ),
-            NavigationDestination(
+            BottomNavigationBarItem(
               icon: const Icon(Icons.inventory_2_outlined),
-              selectedIcon: const Icon(Icons.inventory_2),
+              activeIcon: const Icon(Icons.inventory_2),
               label: l10n.inventory,
             ),
-            NavigationDestination(
+            BottomNavigationBarItem(
               icon: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -126,14 +131,14 @@ class _MainScreenState extends State<MainScreen> {
               ),
               label: l10n.sell,
             ),
-            NavigationDestination(
+            BottomNavigationBarItem(
               icon: const Icon(Icons.receipt_long_outlined),
-              selectedIcon: const Icon(Icons.receipt_long),
+              activeIcon: const Icon(Icons.receipt_long),
               label: l10n.sales,
             ),
-            NavigationDestination(
+            BottomNavigationBarItem(
               icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings),
+              activeIcon: const Icon(Icons.settings),
               label: l10n.settings,
             ),
           ],
