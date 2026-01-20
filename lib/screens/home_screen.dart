@@ -132,8 +132,7 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.attach_money,
                       iconColor: AppTheme.successColor,
                       iconBgColor: AppTheme.successBg,
-                      backgroundColor:
-                          AppTheme.successBg.withValues(alpha: 0.5),
+                      // backgroundColor: AppTheme.successBg.withValues(alpha: 0.5), // Removed to use default white
                       onTap: () {
                         Navigator.push(
                           context,
