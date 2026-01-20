@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
@@ -5,6 +6,8 @@ import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:zyae/models/product.dart';
+import 'package:zyae/models/sale.dart';
 import 'package:zyae/screens/inventory_screen.dart';
 import 'package:zyae/screens/sales_screen.dart';
 import 'package:zyae/screens/sell_screen.dart';
@@ -44,6 +47,10 @@ class HomeScreen extends StatelessWidget {
 
     double todaysSales = 0;
     var todaysTransactions = 0;
+    
+    final Map<String, int> productSales = {};
+    final Map<String, Product> productMap = {};
+
     for (final sale in salesState.sales) {
       final sameDay = sale.date.year == today.year &&
           sale.date.month == today.month &&
@@ -52,6 +59,27 @@ class HomeScreen extends StatelessWidget {
         todaysSales += sale.total;
         todaysTransactions += 1;
       }
+      
+      for (final item in sale.items) {
+         final pid = item.product.id;
+         productSales[pid] = (productSales[pid] ?? 0) + item.quantity;
+         productMap[pid] = item.product;
+      }
+    }
+    
+    final sortedProductIds = productSales.keys.toList()
+      ..sort((a, b) => productSales[b]!.compareTo(productSales[a]!));
+    final topSelling = sortedProductIds.take(5).map((id) => productMap[id]!).toList();
+    
+    final recentSales = List<Sale>.from(salesState.sales)
+      ..sort((a, b) => b.date.compareTo(a.date));
+    final last3Sales = recentSales.take(3).toList();
+
+    String getGreeting() {
+      final hour = DateTime.now().hour;
+      if (hour < 12) return l10n.goodMorning;
+      if (hour < 17) return l10n.goodAfternoon;
+      return l10n.goodEvening;
     }
 
     return Scaffold(
@@ -66,10 +94,11 @@ class HomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.appTitle,
+                        getGreeting(),
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
                         ),
                       ),
                       Text(
@@ -174,6 +203,173 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+              _buildSectionTitle(l10n.topSelling),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 160,
+                child: topSelling.isEmpty
+                    ? Center(
+                        child: Text(
+                          l10n.noSalesFound,
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                      )
+                    : ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: topSelling.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
+                        itemBuilder: (context, index) {
+                          final product = topSelling[index];
+                          return Container(
+                            width: 120,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                  color: Colors.grey.withValues(alpha: 0.2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(12),
+                                      image: product.imagePath != null
+                                          ? DecorationImage(
+                                              image: FileImage(
+                                                  File(product.imagePath!)),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
+                                    ),
+                                    child: product.imagePath == null
+                                        ? const Center(
+                                            child: Icon(Icons.image,
+                                                color: Colors.grey))
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  product.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '${productSales[product.id]} ${l10n.sold}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionTitle(l10n.recentSales),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SalesScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      l10n.viewAll,
+                      style: const TextStyle(color: AppTheme.primaryColor),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (last3Sales.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(l10n.noSalesFound,
+                        style: TextStyle(color: Colors.grey[400])),
+                  ),
+                )
+              else
+                ...last3Sales.map((sale) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: Colors.grey.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.receipt_long,
+                              color: AppTheme.primaryColor, size: 20),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${sale.totalItems} items',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                DateFormat('MMM dd, hh:mm a').format(sale.date),
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '${sale.total.toStringAsFixed(0)} MMK',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppTheme.successColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
