@@ -104,6 +104,8 @@ class _MainScreenState extends State<MainScreen> {
           selectedItemColor: AppTheme.primaryColor,
           unselectedItemColor: Colors.grey,
           showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
           elevation: 0,
           items: [
             BottomNavigationBarItem(
