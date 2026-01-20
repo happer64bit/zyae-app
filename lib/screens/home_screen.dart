@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/screens/inventory_screen.dart';
+import 'package:zyae/screens/sale_detail_screen.dart';
 import 'package:zyae/screens/sales_screen.dart';
 import 'package:zyae/screens/sell_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -133,6 +134,14 @@ class HomeScreen extends StatelessWidget {
                       iconBgColor: AppTheme.successBg,
                       backgroundColor:
                           AppTheme.successBg.withValues(alpha: 0.5),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SalesScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -143,6 +152,14 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.shopping_bag_outlined,
                       iconColor: AppTheme.warningColor,
                       iconBgColor: AppTheme.warningBg,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SalesScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -316,57 +333,95 @@ class HomeScreen extends StatelessWidget {
                 )
               else
                 ...last3Sales.map((sale) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          color: Colors.grey.withValues(alpha: 0.2)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.receipt_long,
-                              color: AppTheme.primaryColor, size: 20),
+                  final productNames = sale.items.map((i) => i.product.name).join(', ');
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SaleDetailScreen(sale: sale),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${sale.totalItems} items',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                            color: Colors.grey.withValues(alpha: 0.2)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.receipt_long,
+                                color: AppTheme.primaryColor, size: 20),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  productNames,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                DateFormat('MMM dd, hh:mm a').format(sale.date),
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${sale.totalItems} items',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '•',
+                                      style: TextStyle(color: Colors.grey[400]),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      DateFormat('hh:mm a').format(sale.date),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${sale.total.toStringAsFixed(0)} MMK',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: AppTheme.successColor,
+                          Text(
+                            '${sale.total.toStringAsFixed(0)} MMK',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: AppTheme.successColor,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 }),

@@ -87,5 +87,8 @@
   "viewAll": "View All",
   "goodMorning": "Good Morning",
   "goodAfternoon": "Good Afternoon",
-  "goodEvening": "Good Evening"
+  "goodEvening": "Good Evening",
+  "saleDetails": "Sale Details",
+  "totalAmount": "Total Amount",
+  "items": "Items"
 }
