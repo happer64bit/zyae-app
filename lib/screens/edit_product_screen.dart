@@ -271,48 +271,60 @@ class _EditProductScreenState extends State<EditProductScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(widget.isNew ? l10n.addProduct : l10n.editProduct),
-        centerTitle: true,
-        actions: [
-          if (!widget.isNew)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(l10n.delete),
-                    content: Text(l10n.confirmDelete),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(l10n.cancel),
-                      ),
-                      TextButton(
-                        onPressed: () => _deleteProduct(),
-                        child: Text(
-                          l10n.delete,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                );
-              },
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
+                  Expanded(
+                    child: Text(
+                      widget.isNew ? l10n.addProduct : l10n.editProduct,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  if (!widget.isNew)
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(l10n.delete),
+                            content: Text(l10n.confirmDelete),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(l10n.cancel),
+                              ),
+                              TextButton(
+                                onPressed: () => _deleteProduct(),
+                                child: Text(
+                                  l10n.delete,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  else
+                    const SizedBox(width: 48), // Placeholder to balance the title centering
+                ],
+              ),
+              const SizedBox(height: 24),
+              Center(
               child: GestureDetector(
                 onTap: _pickImage,
                 child: Container(
@@ -528,7 +540,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildLabel(String text) {

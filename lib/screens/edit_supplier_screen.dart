@@ -42,29 +42,46 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
     final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.supplier == null ? l10n.addContact : l10n.editContact),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _save,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
-                  child: _imagePath == null ? const Icon(Icons.add_a_photo, size: 40) : null,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    if (Navigator.canPop(context))
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                    Text(
+                      widget.supplier == null ? l10n.addContact : l10n.editContact,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.save),
+                      onPressed: _save,
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 24),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
+                    child: _imagePath == null ? const Icon(Icons.add_a_photo, size: 40) : null,
+                  ),
+                ),
               if (_imagePath == null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
@@ -91,6 +108,7 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

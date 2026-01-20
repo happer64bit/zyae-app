@@ -13,7 +13,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
+        child: ListView(
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -29,10 +29,7 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView(
-                children: [
-                  _buildSectionHeader(l10n.language),
+            _buildSectionHeader(l10n.language),
                   _buildLanguageOption(
                     context,
                     l10n.english,
@@ -74,9 +71,6 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     onTap: () => _showResetConfirmation(context, l10n),
                   ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

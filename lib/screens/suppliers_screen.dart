@@ -14,52 +14,83 @@ class SuppliersScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.contacts),
-      ),
-      body: BlocBuilder<SuppliersCubit, SuppliersState>(
-        builder: (context, state) {
-          if (state is SuppliersLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          if (state is SuppliersError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-
-          if (state is SuppliersLoaded) {
-            final suppliers = state.suppliers;
-            if (suppliers.isEmpty) {
-              return Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added')));
+      body: SafeArea(
+        child: BlocBuilder<SuppliersCubit, SuppliersState>(
+          builder: (context, state) {
+            if (state is SuppliersLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            
+            if (state is SuppliersError) {
+              return Center(child: Text('Error: ${state.message}'));
             }
 
-            return ListView.builder(
-              itemCount: suppliers.length,
-              itemBuilder: (context, index) {
-                final supplier = suppliers[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: supplier.imagePath != null
-                        ? FileImage(File(supplier.imagePath!))
-                        : null,
-                    child: supplier.imagePath == null
-                        ? Text(supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?')
-                        : null,
+            if (state is SuppliersLoaded) {
+              final suppliers = state.suppliers;
+              
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          if (Navigator.canPop(context))
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ),
+                          Text(
+                            l10n.contacts,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  title: Text(supplier.name),
-                  subtitle: supplier.phoneNumber != null ? Text(supplier.phoneNumber!) : null,
-                  onTap: () => _editSupplier(context, supplier),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deleteSupplier(context, supplier),
-                  ),
-                );
-              },
-            );
-          }
+                  if (suppliers.isEmpty)
+                    SliverFillRemaining(
+                      child: Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added'))),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final supplier = suppliers[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: supplier.imagePath != null
+                                  ? FileImage(File(supplier.imagePath!))
+                                  : null,
+                              child: supplier.imagePath == null
+                                  ? Text(supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?')
+                                  : null,
+                            ),
+                            title: Text(supplier.name),
+                            subtitle: supplier.phoneNumber != null ? Text(supplier.phoneNumber!) : null,
+                            onTap: () => _editSupplier(context, supplier),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteSupplier(context, supplier),
+                            ),
+                          );
+                        },
+                        childCount: suppliers.length,
+                      ),
+                    ),
+                ],
+              );
+            }
 
-          return const SizedBox.shrink();
-        },
+            return const SizedBox.shrink();
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addSupplier(context),

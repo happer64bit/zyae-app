@@ -112,101 +112,113 @@ class _SellScreenState extends State<SellScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
                     children: [
-                      Text(
-                        'New Sale',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'New Sale',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Tap to add items',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              onPressed: _scanBarcode,
+                              icon: const Icon(Icons.qr_code_scanner, size: 28),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        'Tap to add items',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search products...',
+                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                          ),
+                          onChanged: (value) => setState(() {}),
                         ),
                       ),
+                      const SizedBox(height: 16),
                     ],
                   ),
-                  IconButton(
-                    onPressed: _scanBarcode,
-                    icon: const Icon(Icons.qr_code_scanner, size: 28),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search products...',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 ),
-                onChanged: (value) => setState(() {}),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth < 600) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
+                if (constraints.maxWidth < 600)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
                         final product = products[index];
-                        return ProductListItem(
-                          product: product,
-                          onTap: () => context.read<CartCubit>().addToCart(product),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ProductListItem(
+                            product: product,
+                            onTap: () => context.read<CartCubit>().addToCart(product),
+                          ),
                         );
                       },
-                    );
-                  } else {
-                    return GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                      childCount: products.length,
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 200,
                         childAspectRatio: 0.75,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
                       ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        return ProductGridItem(
-                          product: product,
-                          onTap: () => context.read<CartCubit>().addToCart(product),
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
-          ],
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final product = products[index];
+                          return ProductGridItem(
+                            product: product,
+                            onTap: () => context.read<CartCubit>().addToCart(product),
+                          );
+                        },
+                        childCount: products.length,
+                      ),
+                    ),
+                  ),
+                const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+              ],
+            );
+          },
         ),
       ),
       floatingActionButton: cartState.items.isNotEmpty
