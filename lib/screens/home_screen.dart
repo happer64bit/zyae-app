@@ -5,13 +5,11 @@ import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/models/sale.dart';
-import 'package:zyae/screens/inventory_screen.dart';
 import 'package:zyae/screens/sale_detail_screen.dart';
-import 'package:zyae/screens/sales_screen.dart';
-import 'package:zyae/screens/sell_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_list_item.dart';
 import 'package:zyae/widgets/quick_action_button.dart';
@@ -133,14 +131,7 @@ class HomeScreen extends StatelessWidget {
                       iconColor: AppTheme.successColor,
                       iconBgColor: AppTheme.successBg,
                       // backgroundColor: AppTheme.successBg.withValues(alpha: 0.5), // Removed to use default white
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SalesScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => context.go('/sales'),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -151,14 +142,7 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.shopping_bag_outlined,
                       iconColor: AppTheme.warningColor,
                       iconBgColor: AppTheme.warningBg,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SalesScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => context.go('/sales'),
                     ),
                   ),
                 ],
@@ -166,56 +150,33 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildSectionTitle(l10n.quickActions),
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.5,
                 children: [
                   QuickActionButton(
                     label: l10n.newSale,
                     icon: Icons.shopping_cart_outlined,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SellScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.go('/sell'),
                   ),
                   QuickActionButton(
                     label: l10n.addItem,
                     icon: Icons.add_circle_outline,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const InventoryScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/edit-product'),
                   ),
                   QuickActionButton(
                     label: l10n.inventory,
                     icon: Icons.inventory_2_outlined,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const InventoryScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.go('/inventory'),
                   ),
                   QuickActionButton(
                     label: l10n.summary,
                     icon: Icons.bar_chart,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SalesScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.go('/sales'),
                   ),
                 ],
               ),
@@ -306,14 +267,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _buildSectionTitle(l10n.recentSales),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SalesScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () => context.go('/sales'),
                     child: Text(
                       l10n.viewAll,
                       style: const TextStyle(color: AppTheme.primaryColor),
@@ -447,14 +401,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const InventoryScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () => context.go('/inventory'),
                     child: Text(
                       l10n.viewAll,
                       style: const TextStyle(color: AppTheme.primaryColor),
@@ -486,14 +433,7 @@ class HomeScreen extends StatelessWidget {
           height: 56,
           width: MediaQuery.of(context).size.width - 32,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SellScreen(),
-                ),
-              );
-            },
+            onPressed: () => context.go('/sell'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
