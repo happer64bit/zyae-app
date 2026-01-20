@@ -21,11 +21,11 @@ class AppTheme {
   static ThemeData getTheme(Locale locale) {
     final isBurmese = locale.languageCode == 'my';
     final fontFamily = isBurmese 
-        ? GoogleFonts.padauk().fontFamily 
+        ? GoogleFonts.notoSansMyanmar().fontFamily 
         : GoogleFonts.poppins().fontFamily;
     
     final textTheme = isBurmese
-        ? GoogleFonts.padaukTextTheme()
+        ? GoogleFonts.notoSansMyanmarTextTheme()
         : GoogleFonts.poppinsTextTheme();
 
     return ThemeData(
