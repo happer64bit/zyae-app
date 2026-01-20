@@ -91,7 +91,7 @@ class CartBottomSheet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total (${state.totalItems} items)',
+                    '${l10n.total} (${state.totalItems} items)',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   Text(
@@ -124,8 +124,8 @@ class CartBottomSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'Complete Sale',
+                  child: Text(
+                    l10n.completeSale,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

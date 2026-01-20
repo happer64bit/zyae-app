@@ -90,5 +90,8 @@
   "goodEvening": "Good Evening",
   "saleDetails": "Sale Details",
   "totalAmount": "Total Amount",
-  "items": "Items"
+  "items": "Items",
+  "tapToAddItems": "Tap to add items",
+  "error": "Error",
+  "noContactsAdded": "No contacts added yet"
 }

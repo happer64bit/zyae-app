@@ -105,6 +105,7 @@ class _SellScreenState extends State<SellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final inventoryState = context.watch<InventoryCubit>().state;
     final cartState = context.watch<CartCubit>().state;
     final allProducts = inventoryState.products;
@@ -124,19 +125,19 @@ class _SellScreenState extends State<SellScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Column(
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'New Sale',
-                                  style: TextStyle(
+                                  l10n.newSale,
+                                  style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  'Tap to add items',
-                                  style: TextStyle(
+                                  l10n.tapToAddItems,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                     color: Colors.grey,
@@ -156,7 +157,7 @@ class _SellScreenState extends State<SellScreen> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            hintText: 'Search products...',
+                            hintText: l10n.searchProducts,
                             prefixIcon: const Icon(Icons.search, color: Colors.grey),
                             filled: true,
                             fillColor: Colors.white,

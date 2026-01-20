@@ -22,7 +22,7 @@ class SuppliersScreen extends StatelessWidget {
             }
             
             if (state is SuppliersError) {
-              return Center(child: Text('Error: ${state.message}'));
+              return Center(child: Text('${l10n.error}: ${state.message}'));
             }
 
             if (state is SuppliersLoaded) {
@@ -56,7 +56,7 @@ class SuppliersScreen extends StatelessWidget {
                   ),
                   if (suppliers.isEmpty)
                     SliverFillRemaining(
-                      child: Center(child: Text(l10n.noSalesYet.replaceFirst('sales', 'contacts').replaceFirst('recorded', 'added'))),
+                      child: Center(child: Text(l10n.noContactsAdded)),
                     )
                   else
                     SliverList(

@@ -34,18 +34,24 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _showLanguagePicker(SettingsCubit settingsCubit) {
+    // Note: l10n is not available here as context is not yet fully initialized with locale
+    // during post frame callback if using basic setup, but standard AppLocalizations.of(context)
+    // should work if MaterialApp is set up correctly.
+    // However, for a language picker, showing native names is preferred.
+    final l10n = AppLocalizations.of(context)!;
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => PopScope(
         canPop: false,
         child: AlertDialog(
-          title: const Text('Select Language / ဘာသာစကားရွေးပါ'),
+          title: Text(l10n.selectLanguage),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: const Text('English'),
+                title: Text(l10n.english),
                 onTap: () {
                   settingsCubit.setLocale(const Locale('en'));
                   settingsCubit.completeFirstLaunch();
@@ -53,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
               ListTile(
-                title: const Text('Burmese (မြန်မာ)'),
+                title: Text(l10n.burmese),
                 onTap: () {
                   settingsCubit.setLocale(const Locale('my'));
                   settingsCubit.completeFirstLaunch();
