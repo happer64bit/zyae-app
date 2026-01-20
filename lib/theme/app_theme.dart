@@ -18,14 +18,23 @@ class AppTheme {
   static const Color errorColor = Color(0xFFC62828);
   static const Color errorBg = Color(0xFFFFEBEE);
 
-  static ThemeData get lightTheme {
+  static ThemeData getTheme(Locale locale) {
+    final isBurmese = locale.languageCode == 'my';
+    final fontFamily = isBurmese 
+        ? GoogleFonts.padauk().fontFamily 
+        : GoogleFonts.poppins().fontFamily;
+    
+    final textTheme = isBurmese
+        ? GoogleFonts.padaukTextTheme()
+        : GoogleFonts.poppinsTextTheme();
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
       ),
       scaffoldBackgroundColor: backgroundColor,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: backgroundColor,
         elevation: 0,
         centerTitle: false,
@@ -33,8 +42,9 @@ class AppTheme {
           color: textPrimary,
           fontSize: 24,
           fontWeight: FontWeight.bold,
+          fontFamily: fontFamily,
         ),
-        iconTheme: IconThemeData(color: textPrimary),
+        iconTheme: const IconThemeData(color: textPrimary),
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,
@@ -44,10 +54,11 @@ class AppTheme {
           side: const BorderSide(color: Color(0xFFEEEEEE)),
         ),
       ),
-      fontFamily: GoogleFonts.poppins().fontFamily,
-      textTheme: GoogleFonts.poppinsTextTheme().apply(
+      fontFamily: fontFamily,
+      textTheme: textTheme.apply(
         bodyColor: textPrimary,
         displayColor: textPrimary,
+        fontFamily: fontFamily,
       ),
     );
   }

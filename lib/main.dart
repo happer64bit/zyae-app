@@ -82,7 +82,7 @@ class AppView extends StatelessWidget {
         return MaterialApp.router(
           title: 'Zyae Shop',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
+          theme: AppTheme.getTheme(state.locale),
           locale: state.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
