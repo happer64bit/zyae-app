@@ -76,5 +76,9 @@
   "today": "Today",
   "revenue": "Revenue",
   "sold": "Sold",
-  "orders": "Orders"
+  "orders": "Orders",
+  "oldestFirst": "Oldest First",
+  "newestFirst": "Newest First",
+  "filterByDate": "Filter by Date",
+  "noSalesFound": "No sales found"
 }

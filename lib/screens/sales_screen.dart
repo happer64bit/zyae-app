@@ -6,16 +6,71 @@ import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:zyae/models/product.dart';
+import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/stat_card.dart';
 
-class SalesScreen extends StatelessWidget {
+class SalesScreen extends StatefulWidget {
   const SalesScreen({super.key});
+
+  @override
+  State<SalesScreen> createState() => _SalesScreenState();
+}
+
+class _SalesScreenState extends State<SalesScreen> {
+  DateTimeRange? _selectedDateRange;
+  bool _sortAscending = false;
+
+  List<Sale> _getFilteredSales(List<Sale> sales) {
+    var filtered = List<Sale>.from(sales);
+
+    if (_selectedDateRange != null) {
+      filtered = filtered.where((s) {
+        return s.date.isAfter(_selectedDateRange!.start.subtract(const Duration(seconds: 1))) &&
+            s.date.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
+      }).toList();
+    }
+
+    filtered.sort((a, b) {
+      return _sortAscending ? a.date.compareTo(b.date) : b.date.compareTo(a.date);
+    });
+
+    return filtered;
+  }
+
+  Future<void> _pickDateRange() async {
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _selectedDateRange,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.primaryColor,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDateRange = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final salesState = context.watch<SalesCubit>().state;
     final sales = salesState.sales;
+    final filteredSales = _getFilteredSales(sales);
     final l10n = AppLocalizations.of(context)!;
     final formatter = DateFormat('dd MMM, hh:mm a');
 
@@ -394,61 +449,104 @@ class SalesScreen extends StatelessWidget {
                             const SizedBox(height: 24),
                           ],
 
-                          // Recent Sales
+                          // Recent Sales Header with Controls
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                l10n.recentSales,
+                                _selectedDateRange != null ? l10n.sales : l10n.recentSales,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              // Optional: View All button
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                      color: Colors.grey[600],
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _sortAscending = !_sortAscending;
+                                      });
+                                    },
+                                    tooltip: _sortAscending ? l10n.oldestFirst : l10n.newestFirst,
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: _selectedDateRange != null ? AppTheme.primaryColor : Colors.grey[600],
+                                    ),
+                                    onPressed: _pickDateRange,
+                                    tooltip: l10n.filterByDate,
+                                  ),
+                                  if (_selectedDateRange != null)
+                                    IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.grey),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selectedDateRange = null;
+                                        });
+                                      },
+                                    ),
+                                ],
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
-                          ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: sales.take(10).length, // Show last 10
-                            separatorBuilder: (context, index) => const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              // Show newest first
-                              final sale = sales[sales.length - 1 - index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.grey.shade100),
+                          
+                          if (filteredSales.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 32.0),
+                              child: Center(
+                                child: Text(
+                                  l10n.noSalesFound,
+                                  style: TextStyle(color: Colors.grey[500]),
                                 ),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  leading: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withValues(alpha: 0.1),
-                                      shape: BoxShape.circle,
+                              ),
+                            )
+                          else
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _selectedDateRange != null ? filteredSales.length : filteredSales.take(10).length,
+                              separatorBuilder: (context, index) => const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final sale = filteredSales[index];
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: Colors.grey.shade100),
+                                  ),
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withValues(alpha: 0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.receipt_long, color: Colors.green, size: 20),
                                     ),
-                                    child: const Icon(Icons.receipt_long, color: Colors.green, size: 20),
-                                  ),
-                                  title: Text(
-                                    '${sale.total.toStringAsFixed(0)} MMK',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                    title: Text(
+                                      '${sale.total.toStringAsFixed(0)} MMK',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
+                                    subtitle: Text(
+                                      '${sale.totalItems} ${l10n.items} • ${formatter.format(sale.date)}',
+                                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                                    ),
+                                    trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
                                   ),
-                                  subtitle: Text(
-                                    '${sale.totalItems} ${l10n.items} • ${formatter.format(sale.date)}',
-                                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                                  ),
-                                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
-                                ),
-                              );
-                            },
-                          ),
+                                );
+                              },
+                            ),
                           const SizedBox(height: 32),
                         ],
                       ),
