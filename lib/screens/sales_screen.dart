@@ -9,6 +9,7 @@ import 'package:zyae/models/product.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/stat_card.dart';
+import 'package:zyae/widgets/sale_list_item.dart';
 
 class SalesScreen extends StatefulWidget {
   const SalesScreen({super.key});
@@ -449,7 +450,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             const SizedBox(height: 24),
                           ],
 
-                          // Recent Sales Header with Controls
+                          // Transaction History
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -508,43 +509,13 @@ class _SalesScreenState extends State<SalesScreen> {
                               ),
                             )
                           else
-                            ListView.separated(
+                            ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: _selectedDateRange != null ? filteredSales.length : filteredSales.take(10).length,
-                              separatorBuilder: (context, index) => const SizedBox(height: 12),
                               itemBuilder: (context, index) {
                                 final sale = filteredSales[index];
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: Colors.grey.shade100),
-                                  ),
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    leading: Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withValues(alpha: 0.1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.receipt_long, color: Colors.green, size: 20),
-                                    ),
-                                    title: Text(
-                                      '${sale.total.toStringAsFixed(0)} MMK',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      '${sale.totalItems} ${l10n.items} • ${formatter.format(sale.date)}',
-                                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                                    ),
-                                    trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
-                                  ),
-                                );
+                                return SaleListItem(sale: sale);
                               },
                             ),
                           const SizedBox(height: 32),

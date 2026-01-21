@@ -13,6 +13,7 @@ import 'package:zyae/screens/sale_detail_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_list_item.dart';
 import 'package:zyae/widgets/quick_action_button.dart';
+import 'package:zyae/widgets/sale_list_item.dart';
 import 'package:zyae/widgets/stat_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -285,99 +286,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 )
               else
-                ...last3Sales.map((sale) {
-                  final productNames = sale.items.map((i) => i.product.name).join(', ');
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SaleDetailScreen(sale: sale),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.2)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.receipt_long,
-                                color: AppTheme.primaryColor, size: 20),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  productNames,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Text(
-                                      '${sale.totalItems} items',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '•',
-                                      style: TextStyle(color: Colors.grey[400]),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      DateFormat('hh:mm a').format(sale.date),
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            '${sale.total.toStringAsFixed(0)} MMK',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: AppTheme.successColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
+                ...last3Sales.map((sale) => SaleListItem(sale: sale)),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
