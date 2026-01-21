@@ -247,7 +247,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                   l10n.weeklySales,
                                   style: const TextStyle(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                                 const SizedBox(height: 24),
@@ -263,12 +263,12 @@ class _SalesScreenState extends State<SalesScreen> {
                                           getTooltipColor: (group) => AppTheme.primaryColor,
                                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                             return BarTooltipItem(
-                                              '${NumberFormat("#,##0").format(rod.toY)} MMK',
-                                              const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            );
+                                            '${NumberFormat("#,##0").format(rod.toY)} MMK',
+                                            const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          );
                                           },
                                         ),
                                       ),
@@ -287,7 +287,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                                     style: TextStyle(
                                                       color: Colors.grey[600],
                                                       fontSize: 12,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight: FontWeight.normal,
                                                     ),
                                                   ),
                                                 );
@@ -458,7 +458,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                 _selectedDateRange != null ? l10n.sales : l10n.recentSales,
                                 style: const TextStyle(
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
                               Row(

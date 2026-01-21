@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
       title.toUpperCase(),
       style: const TextStyle(
         fontSize: 12,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.normal,
         color: Colors.grey,
         letterSpacing: 1.0,
       ),
@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                         getGreeting(),
                         style: const TextStyle(
                           fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.normal,
                           color: AppTheme.primaryColor,
                         ),
                       ),
@@ -245,7 +245,7 @@ class HomeScreen extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.normal,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -286,7 +286,15 @@ class HomeScreen extends StatelessWidget {
                   ),
                 )
               else
-                ...last3Sales.map((sale) => SaleListItem(sale: sale)),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: last3Sales.length,
+                  itemBuilder: (context, index) {
+                    return SaleListItem(sale: last3Sales[index]);
+                  },
+                ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -303,7 +311,7 @@ class HomeScreen extends StatelessWidget {
                         '${l10n.lowStockAlert} (${lowStockProducts.length})',
                         style: const TextStyle(
                           color: AppTheme.warningColor,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.normal,
                           fontSize: 14,
                         ),
                       ),
@@ -360,7 +368,7 @@ class HomeScreen extends StatelessWidget {
                   l10n.startNewSale,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],

@@ -42,7 +42,7 @@ class ProductGridItem extends StatelessWidget {
               Text(
                 product.name,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.normal,
                   fontSize: 14,
                 ),
                 maxLines: 2,
@@ -54,7 +54,7 @@ class ProductGridItem extends StatelessWidget {
                 '${product.price.toStringAsFixed(0)} MMK',
                 style: const TextStyle(
                   color: AppTheme.primaryColor, // Orange price in screenshot
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.normal,
                   fontSize: 18,
                 ),
               ),

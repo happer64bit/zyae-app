@@ -44,7 +44,7 @@ class QuickActionButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[800],
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ],

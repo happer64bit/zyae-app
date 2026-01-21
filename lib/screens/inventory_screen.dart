@@ -79,7 +79,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   l10n.inventory,
                                   style: const TextStyle(
                                     fontSize: 24,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                                 Text(

@@ -49,7 +49,7 @@ class ProductListItem extends StatelessWidget {
                     Text(
                       product.name,
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 16,
                       ),
                       maxLines: 1,
