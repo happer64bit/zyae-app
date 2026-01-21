@@ -27,7 +27,7 @@ class SettingsScreen extends StatelessWidget {
                     l10n.settings,
                     style: const TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ],
@@ -73,6 +73,17 @@ class SettingsScreen extends StatelessWidget {
               ),
               onTap: () => _showResetConfirmation(context, l10n),
             ),
+            const SizedBox(height: 32),
+            Center(
+              child: Text(
+                'Made by Wint Khant Lin',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -86,7 +97,7 @@ class SettingsScreen extends StatelessWidget {
         title,
         style: const TextStyle(
           color: AppTheme.primaryColor,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.normal,
           fontSize: 14,
         ),
       ),
