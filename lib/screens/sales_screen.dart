@@ -182,7 +182,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                     width: (constraints.maxWidth - 12) / 2,
                                     child: StatCard(
                                       title: l10n.today,
-                                      value: '${todayTotal.toStringAsFixed(0)} MMK',
+                                      value: '${NumberFormat("#,##0").format(todayTotal)} MMK',
                                       icon: Icons.today,
                                       iconColor: Colors.blue,
                                       iconBgColor: Colors.blue.withValues(alpha: 0.1),
@@ -193,7 +193,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                     width: (constraints.maxWidth - 12) / 2,
                                     child: StatCard(
                                       title: l10n.thisWeek,
-                                      value: '${weekTotal.toStringAsFixed(0)} MMK',
+                                      value: '${NumberFormat("#,##0").format(weekTotal)} MMK',
                                       icon: Icons.calendar_view_week,
                                       iconColor: Colors.orange,
                                       iconBgColor: Colors.orange.withValues(alpha: 0.1),
@@ -203,7 +203,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                     width: (constraints.maxWidth - 12) / 2,
                                     child: StatCard(
                                       title: l10n.thisMonth,
-                                      value: '${monthTotal.toStringAsFixed(0)} MMK',
+                                      value: '${NumberFormat("#,##0").format(monthTotal)} MMK',
                                       icon: Icons.calendar_month,
                                       iconColor: Colors.purple,
                                       iconBgColor: Colors.purple.withValues(alpha: 0.1),
@@ -213,7 +213,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                     width: (constraints.maxWidth - 12) / 2,
                                     child: StatCard(
                                       title: 'Avg. Order', // Consider adding to l10n
-                                      value: '${avgOrderValue.toStringAsFixed(0)} MMK',
+                                      value: '${NumberFormat("#,##0").format(avgOrderValue)} MMK',
                                       icon: Icons.pie_chart_outline,
                                       iconColor: Colors.teal,
                                       iconBgColor: Colors.teal.withValues(alpha: 0.1),
@@ -262,7 +262,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                           getTooltipColor: (group) => AppTheme.primaryColor,
                                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                             return BarTooltipItem(
-                                              '${rod.toY.toStringAsFixed(0)} MMK',
+                                              '${NumberFormat("#,##0").format(rod.toY)} MMK',
                                               const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,

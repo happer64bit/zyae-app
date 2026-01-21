@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
+import 'package:zyae/repositories/data_repository.dart';
+import 'package:zyae/services/backup_service.dart';
 import 'package:zyae/theme/app_theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -10,6 +12,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final repository = context.read<DataRepository>();
+    final backupService = BackupService(repository);
 
     return Scaffold(
       body: SafeArea(
@@ -30,47 +34,45 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             _buildSectionHeader(l10n.language),
-                  _buildLanguageOption(
-                    context,
-                    l10n.english,
-                    const Locale('en'),
-                  ),
-                  _buildLanguageOption(
-                    context,
-                    l10n.burmese,
-                    const Locale('my'),
-                  ),
-                  const Divider(),
-                  _buildSectionHeader(l10n.dataManagement),
-                  ListTile(
-                    leading: const Icon(Icons.download, color: AppTheme.primaryColor),
-                    title: Text(l10n.exportData),
-                    onTap: () async {
-                      // TODO: Implement actual export logic
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.dataExported)),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.upload, color: AppTheme.primaryColor),
-                    title: Text(l10n.importData),
-                    onTap: () async {
-                      // TODO: Implement actual import logic
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.dataImported)),
-                      );
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.delete_forever, color: AppTheme.errorColor),
-                    title: Text(
-                      l10n.resetData,
-                      style: const TextStyle(color: AppTheme.errorColor),
-                    ),
-                    onTap: () => _showResetConfirmation(context, l10n),
-                  ),
+            _buildLanguageOption(
+              context,
+              l10n.english,
+              const Locale('en'),
+            ),
+            _buildLanguageOption(
+              context,
+              l10n.burmese,
+              const Locale('my'),
+            ),
+            const Divider(),
+            _buildSectionHeader(l10n.dataManagement),
+            ListTile(
+              leading: const Icon(Icons.download, color: AppTheme.primaryColor),
+              title: Text(l10n.exportData),
+              subtitle: const Text('Backup all data to a JSON file'),
+              onTap: () => backupService.exportData(context),
+            ),
+            ListTile(
+              leading: const Icon(Icons.upload, color: AppTheme.primaryColor),
+              title: Text(l10n.importData),
+              subtitle: const Text('Restore data from a JSON file'),
+              onTap: () => backupService.importData(context),
+            ),
+            ListTile(
+              leading: const Icon(Icons.table_chart, color: Colors.green),
+              title: Text(l10n.exportToExcel),
+              subtitle: const Text('Export products and sales to Excel'),
+              onTap: () => backupService.exportToExcel(context),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.delete_forever, color: AppTheme.errorColor),
+              title: Text(
+                l10n.resetData,
+                style: const TextStyle(color: AppTheme.errorColor),
+              ),
+              onTap: () => _showResetConfirmation(context, l10n),
+            ),
           ],
         ),
       ),

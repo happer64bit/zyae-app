@@ -67,6 +67,36 @@ class Product {
       imagePath: imagePath ?? this.imagePath,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'unit': unit,
+      'price': price,
+      'quantity': quantity,
+      'lowStockThreshold': lowStockThreshold,
+      'expiryDate': expiryDate?.toIso8601String(),
+      'barcode': barcode,
+      'supplierContact': supplierContact,
+      'imagePath': imagePath,
+    };
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      unit: json['unit'] as String,
+      price: (json['price'] as num).toDouble(),
+      quantity: (json['quantity'] as num).toDouble(),
+      lowStockThreshold: json['lowStockThreshold'] as int,
+      expiryDate: json['expiryDate'] != null ? DateTime.parse(json['expiryDate'] as String) : null,
+      barcode: json['barcode'] as String?,
+      supplierContact: json['supplierContact'] as String?,
+      imagePath: json['imagePath'] as String?,
+    );
+  }
 }
 
 final List<Product> mockProducts = [

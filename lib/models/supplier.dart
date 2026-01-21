@@ -33,4 +33,22 @@ class Supplier {
       imagePath: imagePath ?? this.imagePath,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'phoneNumber': phoneNumber,
+      'imagePath': imagePath,
+    };
+  }
+
+  factory Supplier.fromJson(Map<String, dynamic> json) {
+    return Supplier(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      phoneNumber: json['phoneNumber'] as String?,
+      imagePath: json['imagePath'] as String?,
+    );
+  }
 }

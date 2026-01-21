@@ -126,7 +126,7 @@ class HomeScreen extends StatelessWidget {
                   Expanded(
                     child: StatCard(
                       title: l10n.todaysSales,
-                      value: '${todaysSales.toStringAsFixed(0)} MMK',
+                      value: '${NumberFormat("#,##0").format(todaysSales)} MMK',
                       icon: Icons.attach_money,
                       iconColor: AppTheme.successColor,
                       iconBgColor: AppTheme.successBg,
@@ -138,7 +138,7 @@ class HomeScreen extends StatelessWidget {
                   Expanded(
                     child: StatCard(
                       title: l10n.transactions,
-                      value: todaysTransactions.toString(),
+                      value: NumberFormat.decimalPattern().format(todaysTransactions),
                       icon: Icons.shopping_bag_outlined,
                       iconColor: AppTheme.warningColor,
                       iconBgColor: AppTheme.warningBg,
