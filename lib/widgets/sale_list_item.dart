@@ -65,9 +65,8 @@ class SaleListItem extends StatelessWidget {
                     productNames,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.normal,
-                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -75,22 +74,20 @@ class SaleListItem extends StatelessWidget {
                     children: [
                       Text(
                         '${sale.totalItems} items',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
-                          fontSize: 12,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '•',
-                        style: TextStyle(color: Colors.grey[400]),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[400]),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         dateText,
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
-                          fontSize: 12,
                         ),
                       ),
                     ],

@@ -41,9 +41,8 @@ class ProductGridItem extends StatelessWidget {
               ],
               Text(
                 product.name,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.normal,
-                  fontSize: 14,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -61,9 +60,8 @@ class ProductGridItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '${product.quantity.toStringAsFixed(0)} ${product.unit} left',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
-                  fontSize: 12,
                 ),
               ),
             ],

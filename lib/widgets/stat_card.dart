@@ -63,7 +63,7 @@ class StatCard extends StatelessWidget {
                     ),
                     child: Text(
                       subtitle!,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontSize: 10,
                         color: Colors.grey[600],
                       ),
@@ -88,9 +88,8 @@ class StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               title,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.grey[600],
-                fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
             ),

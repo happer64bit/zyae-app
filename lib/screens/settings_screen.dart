@@ -25,15 +25,14 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   Text(
                     l10n.settings,
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                 ],
               ),
             ),
-            _buildSectionHeader(l10n.language),
+            _buildSectionHeader(context, l10n.language),
             _buildLanguageOption(
               context,
               l10n.english,
@@ -45,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
               const Locale('my'),
             ),
             const Divider(),
-            _buildSectionHeader(l10n.dataManagement),
+            _buildSectionHeader(context, l10n.dataManagement),
             ListTile(
               leading: const Icon(Icons.download, color: AppTheme.primaryColor),
               title: Text(l10n.exportData),
@@ -77,9 +76,8 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: Text(
                 'Made by Wint Khant Lin',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[400],
-                  fontSize: 12,
                 ),
               ),
             ),
@@ -90,15 +88,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
           color: AppTheme.primaryColor,
           fontWeight: FontWeight.normal,
-          fontSize: 14,
         ),
       ),
     );

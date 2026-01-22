@@ -84,8 +84,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                 ),
                                 Text(
                                   '${products.length} ${l10n.items}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.normal,
                                     color: Colors.grey,
                                   ),

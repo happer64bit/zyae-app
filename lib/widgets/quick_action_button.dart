@@ -41,8 +41,7 @@ class QuickActionButton extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[800],
                   fontWeight: FontWeight.normal,
                 ),

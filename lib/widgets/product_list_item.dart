@@ -63,9 +63,8 @@ class ProductListItem extends StatelessWidget {
                       children: [
                         Text(
                           'Qty: ${product.quantity.toStringAsFixed(0)} ${product.unit}',
-                          style: TextStyle(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[600],
-                            fontSize: 14,
                           ),
                         ),
                         if (product.isLowStock)

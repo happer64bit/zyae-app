@@ -150,7 +150,7 @@ class _SalesScreenState extends State<SalesScreen> {
                     Text(
                       '${l10n.noSalesYet}\n${l10n.startNewSale}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -164,8 +164,7 @@ class _SalesScreenState extends State<SalesScreen> {
                       children: [
                         Text(
                           l10n.sales,
-                          style: const TextStyle(
-                            fontSize: 24,
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -245,7 +244,7 @@ class _SalesScreenState extends State<SalesScreen> {
                               children: [
                                 Text(
                                   l10n.weeklySales,
-                                  style: const TextStyle(
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontSize: 18,
                                     fontWeight: FontWeight.normal,
                                   ),
@@ -264,10 +263,10 @@ class _SalesScreenState extends State<SalesScreen> {
                                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                             return BarTooltipItem(
                                             '${NumberFormat("#,##0").format(rod.toY)} MMK',
-                                            const TextStyle(
+                                            Theme.of(context).textTheme.bodyMedium?.copyWith(
                                               color: Colors.white,
                                               fontWeight: FontWeight.normal,
-                                            ),
+                                            ) ?? const TextStyle(color: Colors.white),
                                           );
                                           },
                                         ),
@@ -284,9 +283,8 @@ class _SalesScreenState extends State<SalesScreen> {
                                                   padding: const EdgeInsets.only(top: 8.0),
                                                   child: Text(
                                                     DateFormat.E().format(last7Days[index]),
-                                                    style: TextStyle(
+                                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                       color: Colors.grey[600],
-                                                      fontSize: 12,
                                                       fontWeight: FontWeight.normal,
                                                     ),
                                                   ),
@@ -348,7 +346,7 @@ class _SalesScreenState extends State<SalesScreen> {
                           if (top5.isNotEmpty) ...[
                             Text(
                               l10n.topSellingProducts,
-                              style: const TextStyle(
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -395,7 +393,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                               ? Center(
                                                   child: Text(
                                                     product.name.isNotEmpty ? product.name[0] : '?',
-                                                    style: const TextStyle(
+                                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                                       fontWeight: FontWeight.bold,
                                                       color: Colors.grey,
                                                     ),

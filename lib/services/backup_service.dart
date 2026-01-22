@@ -39,27 +39,27 @@ class BackupService {
       final dateStr = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final fileName = 'zyae_backup_$dateStr.json';
 
-      // On Mobile, we often can't just write to any path. 
+      // On Mobile, we often can't just write to any path.
       // We write to temp and then Share/Save.
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/$fileName');
       await file.writeAsString(jsonString);
 
       if (Platform.isAndroid || Platform.isIOS) {
-        // Use Share sheet which includes "Save to Files"
-        // Note: Share.shareXFiles is deprecated in share_plus 10+
-        final result = await Share.shareXFiles(
-          [XFile(file.path)],
-          subject: 'Zyae Backup $dateStr',
+        final shareResult = await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(file.path)],
+            subject: 'Zyae Backup $dateStr',
+          ),
         );
-        
-        if (result.status == ShareResultStatus.success && context.mounted) {
-             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Backup exported successfully')),
-            );
+
+        if (shareResult.status == ShareResultStatus.success &&
+            context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Backup exported successfully')),
+          );
         }
       } else {
-        // Desktop: Use File Picker to save
         final outputFile = await FilePicker.platform.saveFile(
           dialogTitle: 'Save Backup',
           fileName: fileName,
@@ -78,9 +78,9 @@ class BackupService {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
       }
     }
   }
@@ -133,7 +133,7 @@ class BackupService {
           context.read<InventoryCubit>().loadInventory();
           context.read<SalesCubit>().loadSales();
           context.read<SuppliersCubit>().loadSuppliers();
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Data restored successfully')),
           );
@@ -141,9 +141,9 @@ class BackupService {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Import failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
       }
     }
   }
@@ -151,18 +151,18 @@ class BackupService {
   Future<void> exportToExcel(BuildContext context) async {
     try {
       final excel = Excel.createExcel();
-      
+
       // Products Sheet
       final Sheet sheet1 = excel['Products'];
       sheet1.appendRow([
-        TextCellValue('ID'), 
-        TextCellValue('Name'), 
-        TextCellValue('Price'), 
-        TextCellValue('Quantity'), 
-        TextCellValue('Unit'), 
-        TextCellValue('Barcode')
+        TextCellValue('ID'),
+        TextCellValue('Name'),
+        TextCellValue('Price'),
+        TextCellValue('Quantity'),
+        TextCellValue('Unit'),
+        TextCellValue('Barcode'),
       ]);
-      
+
       final products = _repository.getProducts();
       for (final p in products) {
         sheet1.appendRow([
@@ -178,11 +178,11 @@ class BackupService {
       // Sales Sheet
       final Sheet sheet2 = excel['Sales'];
       sheet2.appendRow([
-        TextCellValue('ID'), 
-        TextCellValue('Date'), 
-        TextCellValue('Total Items'), 
-        TextCellValue('Total Amount'), 
-        TextCellValue('Items')
+        TextCellValue('ID'),
+        TextCellValue('Date'),
+        TextCellValue('Total Items'),
+        TextCellValue('Total Amount'),
+        TextCellValue('Items'),
       ]);
 
       final sales = _repository.getSales();
@@ -190,7 +190,7 @@ class BackupService {
         final itemDetails = s.items
             .map((i) => '${i.product.name} (${i.quantity})')
             .join(', ');
-        
+
         sheet2.appendRow([
           TextCellValue(s.id),
           TextCellValue(DateFormat('yyyy-MM-dd HH:mm').format(s.date)),
@@ -218,16 +218,19 @@ class BackupService {
       await file.writeAsBytes(fileBytes);
 
       if (Platform.isAndroid || Platform.isIOS) {
-         final result = await Share.shareXFiles(
-          [XFile(file.path)],
-          subject: 'Zyae Excel Export $dateStr',
+        final shareResult = await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(file.path)],
+            subject: 'Zyae Excel Export $dateStr',
+          ),
         );
-         if (result.status == ShareResultStatus.success && context.mounted) {
-             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Excel exported successfully')),
-            );
+        if (shareResult.status == ShareResultStatus.success &&
+            context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Excel exported successfully')),
+          );
         }
-      } else {
+            } else {
         final outputFile = await FilePicker.platform.saveFile(
           dialogTitle: 'Save Excel Export',
           fileName: fileName,
@@ -244,12 +247,11 @@ class BackupService {
           }
         }
       }
-
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Excel export failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Excel export failed: $e')));
       }
     }
   }
