@@ -80,7 +80,7 @@ class AppView extends StatelessWidget {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return MaterialApp.router(
-          title: 'Zyae',
+          title: 'ZyaeOS',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.getTheme(state.locale),
           locale: state.locale,
