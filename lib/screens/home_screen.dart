@@ -88,7 +88,6 @@ class HomeScreen extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isLargeScreen = constraints.maxWidth > 600;
-            final crossAxisCount = isLargeScreen ? 4 : 2;
 
             return CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
