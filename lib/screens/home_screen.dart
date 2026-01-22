@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/models/sale.dart';
-import 'package:zyae/screens/sale_detail_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_list_item.dart';
 import 'package:zyae/widgets/quick_action_button.dart';

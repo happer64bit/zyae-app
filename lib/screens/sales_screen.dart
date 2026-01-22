@@ -73,7 +73,7 @@ class _SalesScreenState extends State<SalesScreen> {
     final sales = salesState.sales;
     final filteredSales = _getFilteredSales(sales);
     final l10n = AppLocalizations.of(context)!;
-    final formatter = DateFormat('dd MMM, hh:mm a');
+    // final formatter = DateFormat('dd MMM, hh:mm a');
 
     // --- Analysis Calculations ---
     final now = DateTime.now();
