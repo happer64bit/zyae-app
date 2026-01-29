@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryColor = CupertinoColors.activeBlue; // Orange from screenshot
+  static const Color primaryColor = CupertinoColors.activeBlue;
   static const Color backgroundColor = Color(0xFFF8F9FA); // Light grey background
   static const Color surfaceColor = Colors.white;
   static const Color textPrimary = Color(0xFF1A1A1A);
