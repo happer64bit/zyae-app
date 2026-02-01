@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
@@ -12,7 +11,6 @@ import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_list_item.dart';
 import 'package:zyae/widgets/sale_list_item.dart';
-import 'package:zyae/widgets/stat_card.dart';
 import 'package:zyae/widgets/top_selling_card.dart';
 import 'package:zyae/widgets/touchable_opacity.dart';
 
@@ -45,28 +43,73 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _SectionTitle(title: l10n.todaysOverview),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: StatCard(
-                          title: l10n.todaysSales,
-                          value: '${NumberFormat("#,##0").format(stats.todaysSales)} MMK',
-                          icon: LucideIcons.dollarSign,
-                          iconColor: AppTheme.textPrimary,
-                          onTap: () => context.go('/sales'),
+                  TouchableOpacity(
+                    onTap: () => context.go('/sales'),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryColor,
+                            Color(0xFF0D47A1), // Deep Ocean Blue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: StatCard(
-                          title: l10n.transactions,
-                          value: NumberFormat.decimalPattern().format(stats.todaysTransactions),
-                          icon: LucideIcons.receipt,
-                          iconColor: AppTheme.textPrimary,
-                          onTap: () => context.go('/sales'),
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.todaysSales,
+                            style: AppTheme.titleStyle.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${NumberFormat("#,##0").format(stats.todaysSales)} MMK',
+                            style: AppTheme.priceStyle.copyWith(
+                              color: Colors.white,
+                              fontSize: 32,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 16),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${l10n.transactions}: ${stats.todaysTransactions}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   _SectionTitle(title: l10n.quickActions),
@@ -79,34 +122,34 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
+                crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                childAspectRatio: 1.05,
               ),
               delegate: SliverChildListDelegate([
                 _QuickActionItem(
                   label: l10n.newSale,
-                  icon: LucideIcons.shoppingCart,
+                  icon: Icons.add_shopping_cart_rounded,
                   color: AppTheme.primaryColor,
                   onTap: () => context.go('/sell'),
                 ),
                 _QuickActionItem(
                   label: l10n.addItem,
-                  icon: LucideIcons.packagePlus,
-                  color: AppTheme.successColor,
+                  icon: Icons.add_box_rounded,
+                  color: AppTheme.primaryColor,
                   onTap: () => context.push('/edit-product'),
                 ),
                 _QuickActionItem(
                   label: l10n.inventory,
-                  icon: LucideIcons.package,
-                  color: AppTheme.warningColor,
+                  icon: Icons.inventory_2_rounded,
+                  color: AppTheme.primaryColor,
                   onTap: () => context.go('/inventory'),
                 ),
                 _QuickActionItem(
                   label: l10n.summary,
-                  icon: LucideIcons.chartArea,
-                  color: AppTheme.secondaryColor,
+                  icon: Icons.bar_chart_rounded,
+                  color: AppTheme.primaryColor,
                   onTap: () => context.go('/sales'),
                 ),
               ]),
@@ -165,7 +208,7 @@ class HomeScreen extends StatelessWidget {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(LucideIcons.receipt, size: 48, color: AppTheme.textSecondary.withValues(alpha: 0.5)),
+                      Icon(Icons.receipt_long_rounded, size: 48, color: AppTheme.textSecondary.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noSalesFound,
@@ -208,7 +251,7 @@ class HomeScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
-                                LucideIcons.triangleAlert,
+                                Icons.warning_rounded,
                                 color: AppTheme.errorColor,
                                 size: 20,
                               ),
@@ -253,17 +296,16 @@ class HomeScreen extends StatelessWidget {
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-      floatingActionButton: TouchableOpacity(
-        onTap: () => context.go('/sell'),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          height: 64,
-          width: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.primaryColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(LucideIcons.shoppingCart, color: Colors.white, size: 28),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        height: 64,
+        width: 64,
+        child: FloatingActionButton(
+          onPressed: () => context.go('/sell'),
+          backgroundColor: AppTheme.primaryColor,
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: const Icon(Icons.add_shopping_cart_rounded, color: Colors.white, size: 28),
         ),
       ),
     );
@@ -279,56 +321,40 @@ class HomeScreen extends StatelessWidget {
       return l10n.goodEvening;
     }
 
-    String formatDate(DateTime date) {
-      return DateFormat.yMMMMd(locale.languageCode).format(date);
-    }
-
     return SliverAppBar(
-      expandedHeight: 140,
-      floating: false,
       pinned: true,
-      backgroundColor: AppTheme.surfaceColor,
+      floating: true,
+      backgroundColor: AppTheme.backgroundColor,
       surfaceTintColor: AppTheme.surfaceColor,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-        centerTitle: false,
-        title: Text(
-          getGreeting(),
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontFamily: AppTheme.getTheme(locale).textTheme.headlineMedium?.fontFamily,
-          ),
-        ),
-        background: Stack(
-          children: [
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      formatDate(DateTime.now()),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      elevation: 0,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            getGreeting(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+          Text(
+            'Zyae POS',
+            style: AppTheme.headerStyle.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryColor,
+            ),
+          ),
+        ],
       ),
       actions: [
-        TouchableOpacity(
-          onTap: () => context.push('/settings'),
-          child: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(LucideIcons.settings, color: AppTheme.textPrimary, size: 24),
-          ),
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings_outlined, color: AppTheme.textPrimary),
+          onPressed: () => context.push('/settings'),
         ),
         const SizedBox(width: 8),
       ],
@@ -345,10 +371,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.bold,
-        color: AppTheme.textPrimary,
-      ),
+      style: AppTheme.headerStyle.copyWith(fontSize: 20),
     );
   }
 }
@@ -370,29 +393,35 @@ class _QuickActionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return TouchableOpacity(
       onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.borderColor),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+          border: Border.all(color: AppTheme.borderColor.withValues(alpha: 0.5)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 32),
             ),
-            child: Icon(icon, color: AppTheme.textPrimary, size: 24),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.normal,
-              color: AppTheme.textPrimary,
+            const SizedBox(height: AppTheme.gapSmall),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTheme.titleStyle.copyWith(fontSize: 14),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

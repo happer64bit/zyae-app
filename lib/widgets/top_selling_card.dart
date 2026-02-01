@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
 
@@ -19,8 +18,8 @@ class TopSellingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120,
-      padding: const EdgeInsets.all(12),
+      width: 130,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(16),
@@ -46,7 +45,7 @@ class TopSellingCard extends StatelessWidget {
               child: product.imagePath == null
                   ? const Center(
                       child: Icon(
-                        LucideIcons.image,
+                        Icons.image,
                         color: AppTheme.textSecondary,
                       ),
                     )
@@ -61,12 +60,14 @@ class TopSellingCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppTheme.textPrimary,
+                  height: 1.2,
                 ),
           ),
           Text(
             '$soldCount $soldLabel',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
+                  height: 1.2,
                 ),
           ),
         ],

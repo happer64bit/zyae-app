@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -21,10 +22,8 @@ class ProductListItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
+        padding: const EdgeInsets.all(AppTheme.gapMedium),
+        decoration: AppTheme.cardDecoration.copyWith(
           border: Border.all(color: AppTheme.borderColor),
         ),
         child: Row(
@@ -39,7 +38,7 @@ class ProductListItem extends StatelessWidget {
                       ? DecorationImage(
                           image: ResizeImage(
                             FileImage(File(product.imagePath!)),
-                            width: 100, // Optimize memory usage
+                            width: 100,
                           ),
                           fit: BoxFit.cover,
                         )
@@ -56,62 +55,50 @@ class ProductListItem extends StatelessWidget {
                   children: [
                     Text(
                       product.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16,
-                      ),
+                      style: AppTheme.titleStyle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
+                    Text(
+                      '${NumberFormat("#,##0").format(product.price)} MMK',
+                      style: AppTheme.priceStyle.copyWith(fontSize: 15),
+                    ),
+                    const SizedBox(height: AppTheme.gapSmall),
                     Wrap(
-                      spacing: 8,
+                      spacing: AppTheme.gapSmall,
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'Qty: ${product.quantity.toStringAsFixed(0)} ${product.unit}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: AppTheme.captionStyle,
                         ),
                         if (product.isLowStock)
                           _buildStatusTag(
                             'Low stock',
-                            AppTheme.warningColor,
-                            AppTheme.warningColor.withValues(alpha: 0.1),
+                            AppTheme.stockWarningText,
+                            AppTheme.stockWarningBg,
                             LucideIcons.triangleAlert,
                           )
                         else if (product.isOutOfStock)
                           _buildStatusTag(
                             'Out of stock',
-                            AppTheme.errorColor,
-                            AppTheme.errorColor.withValues(alpha: 0.1),
+                            AppTheme.stockErrorText,
+                            AppTheme.stockErrorBg,
                             LucideIcons.circleAlert,
                           )
                         else if (product.isInStock)
                            _buildStatusTag(
                             'In stock',
-                            AppTheme.successColor,
-                            AppTheme.successColor.withValues(alpha: 0.1),
+                            AppTheme.stockSuccessText,
+                            AppTheme.stockSuccessBg,
                             LucideIcons.circleCheck,
                           ),
                       ],
                     ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${product.price.toStringAsFixed(0)} MMK',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
               ),
               const SizedBox(width: 8),
               const Icon(LucideIcons.chevronRight, color: Colors.grey),
@@ -121,25 +108,23 @@ class ProductListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusTag(String text, Color color, Color bgColor, IconData icon) {
+  Widget _buildStatusTag(String text, Color textColor, Color bgColor, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color, width: 1),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
+          Icon(icon, size: 12, color: textColor),
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+            style: AppTheme.captionStyle.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

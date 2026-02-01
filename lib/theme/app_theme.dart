@@ -2,29 +2,85 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Minimalist Monochromatic Palette
-  static const Color primaryColor = Color(0xFF000000); // Pure Black
-  static const Color secondaryColor = Color(0xFF404040); // Dark Gray
-  static const Color accentColor = Color(0xFFF5F5F5); // Light Gray for backgrounds
-  
-  static const Color backgroundColor = Color(0xFFFFFFFF); // Pure White
-  static const Color surfaceColor = Color(0xFFFFFFFF); // Pure White
-  
-  static const Color textPrimary = Color(0xFF000000); // Black
-  static const Color textSecondary = Color(0xFF757575); // Gray 600
-  static const Color borderColor = Color(0xFFE0E0E0); // Light Gray Border
-  
-  // Functional Colors (kept for utility but muted)
-  static const Color successColor = Color(0xFF10B981); 
-  static const Color warningColor = Color(0xFFF59E0B);
-  static const Color errorColor = Color(0xFFEF4444);
+  static const Color primaryColor = Color(0xFF1565C0);
+  static const Color secondaryColor = Color(0xFF00C853);
+  static const Color accentColor = Color(0xFFE8F0FE);
+
+  static const Color backgroundColor = Color(0xFFF5F7FA);
+  static const Color surfaceColor = Colors.white;
+
+  static const Color textPrimary = Color(0xFF212121);
+  static const Color textSecondary = Color(0xFF757575);
+  static const Color textPlaceholder = Color(0xFF9E9E9E);
+  static const Color borderColor = Color(0xFFE0E0E0);
+
+  static const Color successColor = Color(0xFF2E7D32);
+  static const Color warningColor = Color(0xFFEF6C00);
+  static const Color errorColor = Color(0xFFC62828);
+
+  static const Color moneyColor = Color(0xFF2E7D32);
+  static const Color stockSuccessBg = Color(0xFFE8F5E9);
+  static const Color stockSuccessText = Color(0xFF2E7D32);
+  static const Color stockWarningBg = Color(0xFFFFF3E0);
+  static const Color stockWarningText = Color(0xFFEF6C00);
+  static const Color stockErrorBg = Color(0xFFFFEBEE);
+  static const Color stockErrorText = Color(0xFFC62828);
+
+  // 1. SPACING CONSTANTS
+  static const double gapSmall = 8.0;
+  static const double gapMedium = 16.0;
+  static const double gapLarge = 24.0;
+
+  static const double radiusCard = 16.0;
+  static const double radiusButton = 12.0;
+
+  // 2. TEXT STYLES
+  static TextStyle get headerStyle => GoogleFonts.notoSansMyanmar(
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
+    height: 1.5,
+    color: textPrimary,
+  );
+
+  static TextStyle get priceStyle => GoogleFonts.inter(
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: primaryColor,
+  );
+
+  static TextStyle get titleStyle => GoogleFonts.notoSansMyanmar(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+    color: textPrimary,
+  );
+
+  static TextStyle get captionStyle => GoogleFonts.notoSansMyanmar(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    height: 1.2,
+    color: textSecondary,
+  );
+
+  // 3. CARD DECORATION
+  static BoxDecoration get cardDecoration => BoxDecoration(
+    color: surfaceColor,
+    borderRadius: BorderRadius.circular(radiusCard),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.05),
+        blurRadius: 10,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  );
 
   static ThemeData getTheme(Locale locale) {
     final isBurmese = locale.languageCode == 'my';
-    final fontFamily = isBurmese 
-        ? GoogleFonts.notoSansMyanmar().fontFamily 
+    final fontFamily = isBurmese
+        ? GoogleFonts.notoSansMyanmar().fontFamily
         : GoogleFonts.poppins().fontFamily;
-    
+
     final textTheme = isBurmese
         ? GoogleFonts.notoSansMyanmarTextTheme()
         : GoogleFonts.poppinsTextTheme();
@@ -55,7 +111,7 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,
-        elevation: 0,
+        elevation: 2,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -80,7 +136,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceColor,
+        fillColor: const Color(0xFFF7F9FC),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -95,7 +151,12 @@ class AppTheme {
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         labelStyle: TextStyle(color: textSecondary, fontFamily: fontFamily),
-        hintStyle: TextStyle(color: textSecondary.withValues(alpha: 0.7), fontFamily: fontFamily),
+        hintStyle: TextStyle(
+          color: textPlaceholder,
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          fontFamily: fontFamily,
+        ),
       ),
       iconTheme: const IconThemeData(
         color: textPrimary,

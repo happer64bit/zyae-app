@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_grid_item.dart';
 import 'package:zyae/widgets/product_list_item.dart';
@@ -86,6 +84,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                     color: AppTheme.textPrimary,
                                     fontWeight: FontWeight.normal,
+                                    height: 1.2,
                                   ),
                                 ),
                                 Text(
@@ -93,6 +92,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.normal,
                                     color: AppTheme.textSecondary,
+                                    height: 1.2,
                                   ),
                                 ),
                               ],
@@ -101,36 +101,49 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               onTap: () {
                                 context.push('/edit-product');
                               },
-                              child: const Icon(LucideIcons.circlePlus, color: AppTheme.primaryColor, size: 32),
+                              child: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
                             ),
                           ],
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: l10n.searchProducts,
-                            hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
-                            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.textSecondary),
-                            filled: true,
-                            fillColor: AppTheme.surfaceColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppTheme.borderColor),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppTheme.borderColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppTheme.primaryColor),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          onChanged: _onSearchChanged,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: l10n.searchProducts,
+                              hintStyle: const TextStyle(color: AppTheme.textPlaceholder),
+                              prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(color: AppTheme.borderColor),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(color: AppTheme.borderColor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            onChanged: _onSearchChanged,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),

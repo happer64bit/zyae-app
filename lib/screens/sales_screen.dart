@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -100,7 +99,7 @@ class _SalesScreenState extends State<SalesScreen> {
   @override
   Widget build(BuildContext context) {
     final salesState = context.watch<SalesCubit>().state;
-    final sales = salesState.allSalesForStats.isNotEmpty ? salesState.allSalesForStats : salesState.sales;
+    final sales = salesState.sales;
     final filteredSales = _getFilteredSales(sales);
     final l10n = AppLocalizations.of(context)!;
     
@@ -118,7 +117,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(LucideIcons.trendingUp, size: 64, color: AppTheme.textSecondary),
+                    const Icon(Icons.analytics_outlined, size: 64, color: AppTheme.textSecondary),
                     const SizedBox(height: 16),
                     Text(
                       '${l10n.noSalesYet}\n${l10n.startNewSale}',
@@ -159,8 +158,9 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.today,
                                     value: '${NumberFormat("#,##0").format(stats.todayTotal)} MMK',
-                                    icon: LucideIcons.calendar,
+                                    icon: Icons.today,
                                     iconColor: AppTheme.textPrimary,
+                                    iconBgColor: AppTheme.textPrimary.withValues(alpha: 0.1),
                                     subtitle: '${stats.todayOrders} ${l10n.orders}',
                                   ),
                                 ),
@@ -169,8 +169,9 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.thisWeek,
                                     value: '${NumberFormat("#,##0").format(stats.weekTotal)} MMK',
-                                    icon: LucideIcons.calendarRange,
+                                    icon: Icons.calendar_view_week,
                                     iconColor: AppTheme.textPrimary,
+                                    iconBgColor: AppTheme.textPrimary.withValues(alpha: 0.1),
                                   ),
                                 ),
                                 SizedBox(
@@ -178,8 +179,9 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.thisMonth,
                                     value: '${NumberFormat("#,##0").format(stats.monthTotal)} MMK',
-                                    icon: LucideIcons.calendarDays,
+                                    icon: Icons.calendar_month,
                                     iconColor: AppTheme.textPrimary,
+                                    iconBgColor: AppTheme.textPrimary.withValues(alpha: 0.1),
                                   ),
                                 ),
                                 SizedBox(
@@ -187,8 +189,9 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: 'Avg. Order', // Consider adding to l10n
                                     value: '${NumberFormat("#,##0").format(stats.avgOrderValue)} MMK',
-                                    icon: LucideIcons.circleDollarSign,
+                                    icon: Icons.pie_chart_outline,
                                     iconColor: AppTheme.textPrimary,
+                                    iconBgColor: AppTheme.textPrimary.withValues(alpha: 0.1),
                                   ),
                                 ),
                               ],
@@ -437,7 +440,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    LucideIcons.calendar,
+                                    Icons.calendar_month_outlined,
                                     color: _selectedDateRange != null ? AppTheme.primaryColor : AppTheme.textSecondary,
                                   ),
                                   onPressed: _pickDateRange,
@@ -445,7 +448,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                 ),
                                 if (_selectedDateRange != null)
                                   IconButton(
-                                    icon: const Icon(LucideIcons.x, color: AppTheme.textSecondary),
+                                    icon: const Icon(Icons.close, color: AppTheme.textSecondary),
                                     onPressed: () {
                                       setState(() {
                                         _selectedDateRange = null;

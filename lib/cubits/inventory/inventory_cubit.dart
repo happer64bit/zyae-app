@@ -6,36 +6,30 @@ import 'package:zyae/repositories/data_repository.dart';
 
 class InventoryCubit extends Cubit<InventoryState> {
   final DataRepository _repository;
-  static const int _limit = 20;
 
   InventoryCubit({required DataRepository repository})
       : _repository = repository,
         super(const InventoryState());
 
-  Future<void> loadInventory({String? searchQuery, String? filterType}) async {
-    final query = searchQuery ?? state.searchQuery;
-    final filter = filterType ?? state.filterType;
-
+  Future<void> loadInventory({
+    String? searchQuery,
+    String? filterType,
+  }) async {
     emit(state.copyWith(
       status: InventoryStatus.loading,
-      searchQuery: query,
-      filterType: filter,
-      products: [],
-      hasReachedMax: false,
+      searchQuery: searchQuery,
+      filterType: filterType,
     ));
     try {
       final products = _repository.getProductsPaged(
-        offset: 0,
-        limit: _limit,
-        searchQuery: query,
-        filterType: filter,
+        searchQuery: searchQuery ?? state.searchQuery,
+        filterType: filterType ?? state.filterType,
       );
       final suppliers = _repository.getSuppliers();
       emit(state.copyWith(
         status: InventoryStatus.success,
         products: products,
         suppliers: suppliers,
-        hasReachedMax: products.length < _limit,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -47,22 +41,18 @@ class InventoryCubit extends Cubit<InventoryState> {
 
   Future<void> loadMoreProducts() async {
     if (state.hasReachedMax) return;
-
     try {
-      final currentProducts = state.products;
-      final newProducts = _repository.getProductsPaged(
-        offset: currentProducts.length,
-        limit: _limit,
+      final products = _repository.getProductsPaged(
+        offset: state.products.length,
         searchQuery: state.searchQuery,
         filterType: state.filterType,
       );
-
-      if (newProducts.isEmpty) {
+      if (products.isEmpty) {
         emit(state.copyWith(hasReachedMax: true));
       } else {
         emit(state.copyWith(
-          products: List.of(currentProducts)..addAll(newProducts),
-          hasReachedMax: newProducts.length < _limit,
+          products: List.of(state.products)..addAll(products),
+          hasReachedMax: false,
         ));
       }
     } catch (e) {

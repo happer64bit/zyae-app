@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/cart/cart_cubit.dart';
 import 'package:zyae/cubits/cart/cart_state.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
@@ -40,7 +39,7 @@ class CartBottomSheet extends StatelessWidget {
                 width: 50,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppTheme.borderColor,
+                  color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -82,7 +81,7 @@ class CartBottomSheet extends StatelessWidget {
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Icon(LucideIcons.circleMinus, color: AppTheme.errorColor),
+                              child: Icon(Icons.remove_circle_outline, color: Colors.red),
                             ),
                           ),
                         ],

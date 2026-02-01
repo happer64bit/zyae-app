@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
-import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SaleDetailScreen extends StatelessWidget {
   final Sale sale;
@@ -24,10 +22,7 @@ class SaleDetailScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppTheme.backgroundColor,
         foregroundColor: AppTheme.textPrimary,
-        leading: TouchableOpacity(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
-        ),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -42,6 +37,13 @@ class SaleDetailScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.primaryColor,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -116,7 +118,7 @@ class SaleDetailScreen extends StatelessWidget {
                                 : null,
                           ),
                           child: item.product.imagePath == null
-                              ? const Icon(LucideIcons.image, color: AppTheme.textSecondary)
+                              ? const Icon(Icons.image, color: AppTheme.textSecondary)
                               : null,
                         ),
                         const SizedBox(width: 16),

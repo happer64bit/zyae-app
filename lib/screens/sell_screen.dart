@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/cart/cart_cubit.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
@@ -165,7 +164,7 @@ class _SellScreenState extends State<SellScreen> {
                               onTap: _scanBarcode,
                               child: const Padding(
                                 padding: EdgeInsets.all(8.0),
-                                child: Icon(LucideIcons.scanLine, size: 28, color: AppTheme.textPrimary),
+                                child: Icon(Icons.qr_code_scanner, size: 28, color: AppTheme.textPrimary),
                               ),
                             ),
                           ],
@@ -179,7 +178,7 @@ class _SellScreenState extends State<SellScreen> {
                           decoration: InputDecoration(
                             hintText: l10n.searchProducts,
                             hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
-                            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.textSecondary),
+                            prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
                             filled: true,
                             fillColor: AppTheme.surfaceColor,
                             border: OutlineInputBorder(
@@ -247,46 +246,14 @@ class _SellScreenState extends State<SellScreen> {
           },
         ),
       ),
-      bottomNavigationBar: cartState.items.isNotEmpty
-          ? SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TouchableOpacity(
-                  onTap: () => _showCartSheet(context, allProducts),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(LucideIcons.shoppingCart, color: AppTheme.surfaceColor, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${_totalItems(cartState.items)} items',
-                              style: const TextStyle(
-                                color: AppTheme.surfaceColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '${NumberFormat("#,##0").format(_totalAmount(cartState.items, allProducts))} MMK',
-                          style: const TextStyle(
-                            color: AppTheme.surfaceColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+      floatingActionButton: cartState.items.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () => _showCartSheet(context, allProducts),
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: AppTheme.surfaceColor,
+              label: Text(
+                  '${_totalItems(cartState.items)} items = ${NumberFormat("#,##0").format(_totalAmount(cartState.items, allProducts))} MMK'),
+              icon: const Icon(Icons.shopping_cart),
             )
           : null,
     );

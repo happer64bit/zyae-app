@@ -14,6 +14,14 @@ class MockDataRepository implements DataRepository {
   List<Product> getProducts() => [];
 
   @override
+  List<Product> getProductsPaged({
+    int offset = 0,
+    int limit = 20,
+    String searchQuery = '',
+    String filterType = 'All',
+  }) => [];
+
+  @override
   Future<void> addProduct(Product product) async {}
 
   @override
@@ -36,6 +44,9 @@ class MockDataRepository implements DataRepository {
 
   @override
   List<Sale> getSales() => [];
+
+  @override
+  List<Sale> getSalesPaged({int offset = 0, int limit = 20}) => [];
 
   @override
   Future<void> addSale(Sale sale) async {}

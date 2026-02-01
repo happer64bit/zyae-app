@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/suppliers/suppliers_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/supplier.dart';
 import 'package:zyae/screens/edit_supplier_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
-import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SuppliersScreen extends StatelessWidget {
   const SuppliersScreen({super.key});
@@ -47,9 +45,9 @@ class SuppliersScreen extends StatelessWidget {
                           if (Navigator.canPop(context))
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
-                              child: TouchableOpacity(
-                                onTap: () => Navigator.pop(context),
-                                child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary, size: 24),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+                                onPressed: () => Navigator.pop(context),
                               ),
                             ),
                           Text(
@@ -59,11 +57,6 @@ class SuppliersScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textPrimary,
                             ),
-                          ),
-                          const Spacer(),
-                          TouchableOpacity(
-                            onTap: () => _addSupplier(context),
-                            child: const Icon(LucideIcons.circlePlus, color: AppTheme.primaryColor, size: 32),
                           ),
                         ],
                       ),
@@ -85,51 +78,39 @@ class SuppliersScreen extends StatelessWidget {
                           final supplier = suppliers[index];
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                            child: TouchableOpacity(
-                              onTap: () => _editSupplier(context, supplier),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.surfaceColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppTheme.borderColor),
+                            child: Card(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(color: AppTheme.borderColor),
+                              ),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: AppTheme.backgroundColor,
+                                  backgroundImage: supplier.imagePath != null
+                                      ? FileImage(File(supplier.imagePath!))
+                                      : null,
+                                  child: supplier.imagePath == null
+                                      ? Text(
+                                          supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?',
+                                          style: const TextStyle(color: AppTheme.textSecondary),
+                                        )
+                                      : null,
                                 ),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: AppTheme.backgroundColor,
-                                      backgroundImage: supplier.imagePath != null
-                                          ? FileImage(File(supplier.imagePath!))
-                                          : null,
-                                      child: supplier.imagePath == null
-                                          ? Text(
-                                              supplier.name.isNotEmpty ? supplier.name[0].toUpperCase() : '?',
-                                              style: const TextStyle(color: AppTheme.textSecondary),
-                                            )
-                                          : null,
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            supplier.name,
-                                            style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
-                                          ),
-                                          if (supplier.phoneNumber != null)
-                                            Text(
-                                              supplier.phoneNumber!,
-                                              style: const TextStyle(color: AppTheme.textSecondary),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    TouchableOpacity(
-                                      onTap: () => _deleteSupplier(context, supplier),
-                                      child: const Icon(LucideIcons.trash2, color: AppTheme.errorColor),
-                                    ),
-                                  ],
+                                title: Text(
+                                  supplier.name,
+                                  style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                                ),
+                                subtitle: supplier.phoneNumber != null 
+                                  ? Text(
+                                      supplier.phoneNumber!,
+                                      style: const TextStyle(color: AppTheme.textSecondary),
+                                    ) 
+                                  : null,
+                                onTap: () => _editSupplier(context, supplier),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete, color: AppTheme.errorColor),
+                                  onPressed: () => _deleteSupplier(context, supplier),
                                 ),
                               ),
                             ),
@@ -145,6 +126,12 @@ class SuppliersScreen extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addSupplier(context),
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: AppTheme.surfaceColor,
+        child: const Icon(Icons.add),
       ),
     );
   }

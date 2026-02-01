@@ -18,14 +18,9 @@ class ProductGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return TouchableOpacity(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.borderColor),
-        ),
+      child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -36,10 +31,7 @@ class ProductGridItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       image: DecorationImage(
-                        image: ResizeImage(
-                          FileImage(File(product.imagePath!)),
-                          width: 300, // Optimize memory usage
-                        ),
+                        image: FileImage(File(product.imagePath!)),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -51,6 +43,7 @@ class ProductGridItem extends StatelessWidget {
                 product.name,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.normal,
+                  height: 1.2,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -60,16 +53,18 @@ class ProductGridItem extends StatelessWidget {
               Text(
                 '${product.price.toStringAsFixed(0)} MMK',
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.moneyColor,
                   fontWeight: FontWeight.normal,
                   fontSize: 18,
+                  height: 1.2,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 '${product.quantity.toStringAsFixed(0)} ${product.unit} left',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
+                  color: Colors.grey[600],
+                  height: 1.2,
                 ),
               ),
             ],

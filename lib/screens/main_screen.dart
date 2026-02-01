@@ -35,7 +35,13 @@ class MainScreen extends StatelessWidget {
         height: 70 + bottomPadding,
         decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
-          border: const Border(top: BorderSide(color: AppTheme.borderColor)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
         ),
         child: Padding(
           padding: EdgeInsets.only(bottom: bottomPadding),
@@ -111,7 +117,8 @@ class _NavBarItem extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.transparent,
+              // Subtle background pill for active state
+              color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.1) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -160,6 +167,14 @@ class _MiddleActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.primaryColor,
           shape: BoxShape.circle,
+          // Add a shadow to make it pop inside the white bar
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryColor.withValues(alpha: 0.4),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Center(
           child: Icon(
