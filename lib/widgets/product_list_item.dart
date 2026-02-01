@@ -21,9 +21,10 @@ class ProductListItem extends StatelessWidget {
     return TouchableOpacity(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(AppTheme.gapMedium),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
         decoration: AppTheme.cardDecoration.copyWith(
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppTheme.borderColor),
         ),
         child: Row(

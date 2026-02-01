@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zyae/main.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/models/sale.dart';
+import 'package:zyae/models/sales_stats.dart';
 import 'package:zyae/models/supplier.dart';
 import 'package:zyae/repositories/data_repository.dart';
 
@@ -12,6 +13,9 @@ class MockDataRepository implements DataRepository {
 
   @override
   List<Product> getProducts() => [];
+
+  @override
+  Product? getProduct(String id) => null;
 
   @override
   List<Product> getProductsPaged({
@@ -47,6 +51,12 @@ class MockDataRepository implements DataRepository {
 
   @override
   List<Sale> getSalesPaged({int offset = 0, int limit = 20}) => [];
+
+  @override
+  SalesStats getSalesStats() => const SalesStats();
+
+  @override
+  Future<void> recalculateStats() async {}
 
   @override
   Future<void> addSale(Sale sale) async {}
