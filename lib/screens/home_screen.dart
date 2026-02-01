@@ -43,12 +43,12 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SectionTitle(title: l10n.todaysOverview),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     TouchableOpacity(
                       onTap: () => context.go('/sales'),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -112,9 +112,9 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     _SectionTitle(title: l10n.quickActions),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -124,8 +124,8 @@ class HomeScreen extends StatelessWidget {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
                 childAspectRatio: 1.05,
               ),
               delegate: SliverChildListDelegate([
@@ -162,10 +162,10 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   if (salesState.topSellingProducts.isNotEmpty) ...[
                     _SectionTitle(title: l10n.topSelling),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     SizedBox(
                       height: 190,
                       child: ListView.separated(
@@ -230,7 +230,7 @@ class HomeScreen extends StatelessWidget {
                        return const Center(child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator()));
                     }
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: SaleListItem(sale: salesState.sales[index]),
                     );
                   },

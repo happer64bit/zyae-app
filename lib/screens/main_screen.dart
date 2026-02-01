@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -32,7 +31,7 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(child: navigationShell),
       bottomNavigationBar: Container(
-        height: 70 + bottomPadding,
+        height: 60 + bottomPadding,
         decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
           boxShadow: [
@@ -49,14 +48,14 @@ class MainScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _NavBarItem(
-                icon: LucideIcons.house,
+                icon: Icons.home_rounded,
                 label: l10n.home,
                 isSelected: currentIndex == 0,
                 onTap: () => _onItemTapped(0),
               ),
 
               _NavBarItem(
-                icon: LucideIcons.box,
+                icon: Icons.inventory_2_rounded,
                 label: l10n.inventory,
                 isSelected: currentIndex == 1,
                 onTap: () => _onItemTapped(1),
@@ -69,14 +68,14 @@ class MainScreen extends StatelessWidget {
 
               // 4. Sales
               _NavBarItem(
-                icon: LucideIcons.receipt,
+                icon: Icons.receipt_long_rounded,
                 label: l10n.sales,
                 isSelected: currentIndex == 3,
                 onTap: () => _onItemTapped(3),
               ),
 
               _NavBarItem(
-                icon: LucideIcons.settings,
+                icon: Icons.settings_rounded,
                 label: l10n.settings,
                 isSelected: currentIndex == 4,
                 onTap: () => _onItemTapped(4),
@@ -89,7 +88,6 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-/// A standard navigation item with animations and Burmese-safe text
 class _NavBarItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -117,8 +115,6 @@ class _NavBarItem extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              // Subtle background pill for active state
-              color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.1) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -178,7 +174,7 @@ class _MiddleActionButton extends StatelessWidget {
         ),
         child: Center(
           child: Icon(
-            LucideIcons.shoppingBasket,
+            Icons.shopping_basket_rounded,
             color: AppTheme.surfaceColor,
             // Scale up slightly when selected
             size: isSelected ? 26 : 22,
