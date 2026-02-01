@@ -11,6 +11,8 @@ import 'package:zyae/screens/barcode_scanner_screen.dart';
 import 'package:zyae/screens/edit_supplier_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
 
+import 'package:zyae/widgets/touchable_opacity.dart';
+
 class EditProductScreen extends StatefulWidget {
   final Product? product;
 
@@ -131,7 +133,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             return BlocBuilder<SuppliersCubit, SuppliersState>(
               builder: (context, state) {
                 if (state is SuppliersLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
                 }
                 
                 final suppliers = state is SuppliersLoaded ? state.suppliers : [];
@@ -148,6 +150,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
                             ),
                           ),
                           IconButton(
@@ -279,9 +282,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios),
-                    onPressed: () => Navigator.pop(context),
+                  TouchableOpacity(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24),
                   ),
                   Expanded(
                     child: Text(
@@ -289,14 +292,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
                   if (!widget.isNew)
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
-                      onPressed: () {
+                    TouchableOpacity(
+                      onTap: () {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -305,19 +308,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: Text(l10n.cancel),
+                                child: Text(l10n.cancel, style: const TextStyle(color: AppTheme.textSecondary)),
                               ),
                               TextButton(
                                 onPressed: () => _deleteProduct(),
                                 child: Text(
                                   l10n.delete,
-                                  style: const TextStyle(color: Colors.red),
+                                  style: const TextStyle(color: AppTheme.errorColor),
                                 ),
                               ),
                             ],
                           ),
                         );
                       },
+                      child: const Icon(Icons.delete_outline, color: AppTheme.errorColor, size: 24),
                     )
                   else
                     const SizedBox(width: 48), // Placeholder to balance the title centering
@@ -325,13 +329,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 24),
               Center(
-              child: GestureDetector(
+              child: TouchableOpacity(
                 onTap: _pickImage,
                 child: Container(
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: AppTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(20),
                     image: _imagePath != null
                         ? DecorationImage(
@@ -344,7 +348,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       ? const Icon(
                           Icons.add_a_photo,
                           size: 40,
-                          color: Colors.grey,
+                          color: AppTheme.textSecondary,
                         )
                       : null,
                 ),
@@ -352,7 +356,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ),
             const SizedBox(height: 8),
             if (_imagePath == null)
-              Center(child: Text('${l10n.pickImage} ${l10n.optional}')),
+              Center(child: Text('${l10n.pickImage} ${l10n.optional}', style: const TextStyle(color: AppTheme.textSecondary))),
             const SizedBox(height: 32),
             _buildLabel('${l10n.productName} *'),
             const SizedBox(height: 8),
@@ -364,15 +368,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
               children: [
                 Expanded(child: _buildTextField(_barcodeController)),
                 const SizedBox(width: 8),
-                IconButton.filled(
-                  onPressed: _scanBarcode,
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    shape: RoundedRectangleBorder(
+                TouchableOpacity(
+                  onTap: _scanBarcode,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    child: const Icon(Icons.qr_code_scanner, color: Colors.white),
                   ),
-                  icon: const Icon(Icons.qr_code_scanner),
                 ),
               ],
             ),
@@ -415,7 +420,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: GestureDetector(
+                              child: TouchableOpacity(
                                 onTap: () {
                                   setState(() {
                                     _selectedUnit = unit;
@@ -427,7 +432,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? AppTheme.primaryColor
-                                        : Colors.grey[200],
+                                        : AppTheme.surfaceColor,
+                                    border: isSelected ? null : Border.all(color: AppTheme.borderColor),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -435,7 +441,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                     style: TextStyle(
                                       color: isSelected
                                           ? Colors.white
-                                          : Colors.black,
+                                          : AppTheme.textPrimary,
                                       fontWeight: isSelected
                                           ? FontWeight.bold
                                           : FontWeight.normal,
@@ -470,9 +476,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
             const SizedBox(height: 24),
             _buildLabel(l10n.expiryDate),
             const SizedBox(height: 8),
-            InkWell(
+            TouchableOpacity(
               onTap: _pickExpiryDate,
-              borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
@@ -508,29 +513,26 @@ class _EditProductScreenState extends State<EditProductScreen> {
               onTap: _selectSupplier,
             ),
             const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _saveProduct,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
+            TouchableOpacity(
+              onTap: _saveProduct,
+              child: Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor,
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.save_outlined),
+                    const Icon(Icons.save_outlined, color: Colors.white),
                     const SizedBox(width: 8),
                     Text(
                       widget.isNew ? l10n.addProduct : l10n.update,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -549,7 +551,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       style: const TextStyle(
         fontWeight: FontWeight.w500,
         fontSize: 14,
-        color: Colors.black87,
+        color: AppTheme.textPrimary,
       ),
     );
   }
@@ -566,17 +568,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
       keyboardType: keyboardType,
       readOnly: readOnly,
       onTap: onTap,
+      style: const TextStyle(color: AppTheme.textPrimary),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppTheme.surfaceColor,
         hintText: hintText,
+        hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: const BorderSide(color: AppTheme.borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: const BorderSide(color: AppTheme.borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.primaryColor),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

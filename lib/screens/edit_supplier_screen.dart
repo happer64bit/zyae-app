@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/supplier.dart';
+import 'package:zyae/theme/app_theme.dart';
+
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class EditSupplierScreen extends StatefulWidget {
   final Supplier? supplier;
@@ -42,6 +45,7 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
     final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -54,9 +58,9 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
                     if (Navigator.canPop(context))
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () => Navigator.pop(context),
+                        child: TouchableOpacity(
+                          onTap: () => Navigator.pop(context),
+                          child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24),
                         ),
                       ),
                     Text(
@@ -64,44 +68,84 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.save),
-                      onPressed: _save,
+                    TouchableOpacity(
+                      onTap: _save,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.save, color: AppTheme.primaryColor, size: 24),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                GestureDetector(
+                TouchableOpacity(
                   onTap: _pickImage,
                   child: CircleAvatar(
                     radius: 50,
+                    backgroundColor: AppTheme.surfaceColor,
                     backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
-                    child: _imagePath == null ? const Icon(Icons.add_a_photo, size: 40) : null,
+                    child: _imagePath == null 
+                      ? const Icon(Icons.add_a_photo, size: 40, color: AppTheme.textSecondary) 
+                      : null,
                   ),
                 ),
               if (_imagePath == null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(l10n.pickImage),
+                  child: Text(
+                    l10n.pickImage,
+                    style: const TextStyle(color: AppTheme.textSecondary),
+                  ),
                 ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 32),
               TextFormField(
                 controller: _nameController,
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   labelText: l10n.name,
-                  border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: AppTheme.textSecondary),
+                  filled: true,
+                  fillColor: AppTheme.surfaceColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.borderColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.primaryColor),
+                  ),
                 ),
                 validator: (value) => value == null || value.isEmpty ? l10n.isRequired : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   labelText: l10n.phoneNumber,
-                  border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: AppTheme.textSecondary),
+                  filled: true,
+                  fillColor: AppTheme.surfaceColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.borderColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.primaryColor),
+                  ),
                 ),
                 keyboardType: TextInputType.phone,
               ),
@@ -125,3 +169,4 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
     }
   }
 }
+

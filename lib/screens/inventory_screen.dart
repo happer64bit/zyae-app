@@ -7,6 +7,7 @@ import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/product_grid_item.dart';
 import 'package:zyae/widgets/product_list_item.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -77,8 +78,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               children: [
                                 Text(
                                   l10n.inventory,
-                                  style: const TextStyle(
-                                    fontSize: 24,
+                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                    color: AppTheme.textPrimary,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
@@ -86,16 +87,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   '${products.length} ${l10n.items}',
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.normal,
-                                    color: Colors.grey,
+                                    color: AppTheme.textSecondary,
                                   ),
                                 ),
                               ],
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
-                              onPressed: () {
+                            TouchableOpacity(
+                              onTap: () {
                                 context.push('/edit-product');
                               },
+                              child: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
                             ),
                           ],
                         ),
@@ -106,16 +107,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: l10n.searchProducts,
-                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
+                            prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: AppTheme.surfaceColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                              borderSide: const BorderSide(color: AppTheme.borderColor),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                              borderSide: const BorderSide(color: AppTheme.borderColor),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppTheme.primaryColor),
                             ),
                             contentPadding: const EdgeInsets.symmetric(vertical: 0),
                           ),
@@ -184,6 +190,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       ),
                     ),
                   ),
+                const SliverToBoxAdapter(child: SizedBox(height: 80)),
               ],
             );
           },
@@ -194,30 +201,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   Widget _buildFilterChip(String key, String label) {
     final isSelected = _selectedFilter == key;
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
+    return TouchableOpacity(
+      onTap: () {
         setState(() {
           _selectedFilter = key;
         });
       },
-      backgroundColor: Colors.grey[200],
-      selectedColor: AppTheme.primaryColor,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
-        fontWeight:
-            isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected
-              ? AppTheme.primaryColor
-              : Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryColor : AppTheme.backgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppTheme.surfaceColor : AppTheme.textPrimary,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
-      showCheckmark: false,
     );
   }
 }

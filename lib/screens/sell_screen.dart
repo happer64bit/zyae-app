@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zyae/cubits/cart/cart_cubit.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/screens/barcode_scanner_screen.dart';
+import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/cart_bottom_sheet.dart';
 import 'package:zyae/widgets/product_grid_item.dart';
 import 'package:zyae/widgets/product_list_item.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SellScreen extends StatefulWidget {
   const SellScreen({super.key});
@@ -45,11 +48,19 @@ class _SellScreenState extends State<SellScreen> {
       if (product != null) {
         context.read<CartCubit>().addToCart(product);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${product.name} ${l10n.addedToCart}')),
+          SnackBar(
+            content: Text('${product.name} ${l10n.addedToCart}'),
+            backgroundColor: AppTheme.successColor,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.productNotFound)),
+          SnackBar(
+            content: Text(l10n.productNotFound),
+            backgroundColor: AppTheme.errorColor,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -94,6 +105,8 @@ class _SellScreenState extends State<SellScreen> {
 
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -112,6 +125,7 @@ class _SellScreenState extends State<SellScreen> {
     final products = _filteredProducts(allProducts);
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -133,6 +147,7 @@ class _SellScreenState extends State<SellScreen> {
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
+                                    color: AppTheme.textPrimary,
                                   ),
                                 ),
                                 Text(
@@ -140,14 +155,17 @@ class _SellScreenState extends State<SellScreen> {
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
-                                    color: Colors.grey,
+                                    color: AppTheme.textSecondary,
                                   ),
                                 ),
                               ],
                             ),
-                            IconButton(
-                              onPressed: _scanBarcode,
-                              icon: const Icon(Icons.qr_code_scanner, size: 28),
+                            TouchableOpacity(
+                              onTap: _scanBarcode,
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(Icons.qr_code_scanner, size: 28, color: AppTheme.textPrimary),
+                              ),
                             ),
                           ],
                         ),
@@ -156,18 +174,24 @@ class _SellScreenState extends State<SellScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: TextField(
                           controller: _searchController,
+                          style: const TextStyle(color: AppTheme.textPrimary),
                           decoration: InputDecoration(
                             hintText: l10n.searchProducts,
-                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
+                            prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: AppTheme.surfaceColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                              borderSide: const BorderSide(color: AppTheme.borderColor),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                              borderSide: const BorderSide(color: AppTheme.borderColor),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppTheme.primaryColor),
                             ),
                             contentPadding: const EdgeInsets.symmetric(vertical: 0),
                           ),
@@ -222,14 +246,49 @@ class _SellScreenState extends State<SellScreen> {
           },
         ),
       ),
-      floatingActionButton: cartState.items.isNotEmpty
-          ? FloatingActionButton.extended(
-              onPressed: () => _showCartSheet(context, allProducts),
-              label: Text(
-                  '${_totalItems(cartState.items)} items = ${_totalAmount(cartState.items, allProducts).toStringAsFixed(0)} MMK'),
-              icon: const Icon(Icons.shopping_cart),
+      bottomNavigationBar: cartState.items.isNotEmpty
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TouchableOpacity(
+                  onTap: () => _showCartSheet(context, allProducts),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.shopping_cart, color: AppTheme.surfaceColor, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${_totalItems(cartState.items)} items',
+                              style: const TextStyle(
+                                color: AppTheme.surfaceColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${NumberFormat("#,##0").format(_totalAmount(cartState.items, allProducts))} MMK',
+                          style: const TextStyle(
+                            color: AppTheme.surfaceColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             )
           : null,
     );
   }
 }
+

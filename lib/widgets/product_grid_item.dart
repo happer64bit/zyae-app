@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class ProductGridItem extends StatelessWidget {
   final Product product;
@@ -15,10 +16,9 @@ class ProductGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+    return TouchableOpacity(
+      onTap: onTap,
+      child: Card(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -52,7 +52,7 @@ class ProductGridItem extends StatelessWidget {
               Text(
                 '${product.price.toStringAsFixed(0)} MMK',
                 style: const TextStyle(
-                  color: AppTheme.primaryColor, // Orange price in screenshot
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.normal,
                   fontSize: 18,
                 ),
@@ -61,7 +61,7 @@ class ProductGridItem extends StatelessWidget {
               Text(
                 '${product.quantity.toStringAsFixed(0)} ${product.unit} left',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],

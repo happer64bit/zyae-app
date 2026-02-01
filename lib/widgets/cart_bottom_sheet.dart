@@ -5,6 +5,7 @@ import 'package:zyae/cubits/cart/cart_state.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class CartBottomSheet extends StatelessWidget {
   final List<Product> allProducts;
@@ -38,7 +39,7 @@ class CartBottomSheet extends StatelessWidget {
                 width: 50,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppTheme.borderColor,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -74,11 +75,14 @@ class CartBottomSheet extends StatelessWidget {
                             '${lineTotal.toStringAsFixed(0)} MMK',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                            onPressed: () {
+                          TouchableOpacity(
+                            onTap: () {
                               context.read<CartCubit>().removeFromCart(product.id);
                             },
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(Icons.remove_circle_outline, color: AppTheme.errorColor),
+                            ),
                           ),
                         ],
                       ),
@@ -104,31 +108,30 @@ class CartBottomSheet extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.read<CartCubit>().completeSale();
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.saleCompleted),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              TouchableOpacity(
+                onTap: () {
+                  context.read<CartCubit>().completeSale();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.saleCompleted),
                     ),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 52,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     l10n.completeSale,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/screens/sale_detail_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SaleListItem extends StatelessWidget {
   final Sale sale;
@@ -20,7 +21,7 @@ class SaleListItem extends StatelessWidget {
         ? DateFormat('hh:mm a').format(sale.date)
         : DateFormat('MMM dd, hh:mm a').format(sale.date);
 
-    return GestureDetector(
+    return TouchableOpacity(
       onTap: () {
         Navigator.push(
           context,
@@ -29,33 +30,18 @@ class SaleListItem extends StatelessWidget {
           ),
         );
       },
-      behavior: HitTestBehavior.opaque,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(color: AppTheme.borderColor),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.receipt_long,
-                  color: AppTheme.primaryColor, size: 20),
-            ),
+            const Icon(Icons.receipt_long,
+                color: AppTheme.textPrimary, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -67,6 +53,7 @@ class SaleListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.normal,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -75,19 +62,19 @@ class SaleListItem extends StatelessWidget {
                       Text(
                         '${sale.totalItems} items',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          color: AppTheme.textSecondary,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '•',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[400]),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary.withValues(alpha: 0.5)),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         dateText,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          color: AppTheme.textSecondary,
                         ),
                       ),
                     ],

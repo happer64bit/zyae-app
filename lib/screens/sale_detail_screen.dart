@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SaleDetailScreen extends StatelessWidget {
   final Sale sale;
@@ -16,11 +17,16 @@ class SaleDetailScreen extends StatelessWidget {
     final dateFormat = DateFormat('MMM dd, yyyy - hh:mm a');
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: Text(l10n.saleDetails),
+        title: Text(l10n.saleDetails, style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
+        backgroundColor: AppTheme.backgroundColor,
+        foregroundColor: AppTheme.textPrimary,
+        leading: TouchableOpacity(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -35,20 +41,13 @@ class SaleDetailScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.primaryColor,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
                     Text(
                       l10n.totalAmount,
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -106,7 +105,7 @@ class SaleDetailScreen extends StatelessWidget {
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: AppTheme.backgroundColor,
                             borderRadius: BorderRadius.circular(10),
                             image: item.product.imagePath != null
                                 ? DecorationImage(
@@ -116,7 +115,7 @@ class SaleDetailScreen extends StatelessWidget {
                                 : null,
                           ),
                           child: item.product.imagePath == null
-                              ? const Icon(Icons.image, color: Colors.grey)
+                              ? const Icon(Icons.image, color: AppTheme.textSecondary)
                               : null,
                         ),
                         const SizedBox(width: 16),
@@ -129,13 +128,14 @@ class SaleDetailScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
+                                  color: AppTheme.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${item.quantity} x ${item.product.price.toStringAsFixed(0)} MMK',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
                                   fontSize: 14,
                                 ),
                               ),
@@ -147,6 +147,7 @@ class SaleDetailScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
+                            color: AppTheme.textPrimary,
                           ),
                         ),
                       ],

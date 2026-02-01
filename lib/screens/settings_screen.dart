@@ -5,6 +5,7 @@ import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/repositories/data_repository.dart';
 import 'package:zyae/services/backup_service.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -16,22 +17,22 @@ class SettingsScreen extends StatelessWidget {
     final backupService = BackupService(repository);
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Text(
-                    l10n.settings,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                l10n.settings,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
               ),
             ),
+            const SizedBox(height: 16),
             _buildSectionHeader(context, l10n.language),
             _buildLanguageOption(
               context,
@@ -43,33 +44,38 @@ class SettingsScreen extends StatelessWidget {
               l10n.burmese,
               const Locale('my'),
             ),
-            const Divider(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(color: AppTheme.borderColor),
+            ),
             _buildSectionHeader(context, l10n.dataManagement),
-            ListTile(
-              leading: const Icon(Icons.download, color: AppTheme.primaryColor),
-              title: Text(l10n.exportData),
-              subtitle: const Text('Backup all data to a JSON file'),
+            _SettingsTile(
+              icon: Icons.download_rounded,
+              title: l10n.exportData,
+              subtitle: 'Backup all data to a JSON file',
               onTap: () => backupService.exportData(context),
             ),
-            ListTile(
-              leading: const Icon(Icons.upload, color: AppTheme.primaryColor),
-              title: Text(l10n.importData),
-              subtitle: const Text('Restore data from a JSON file'),
+            _SettingsTile(
+              icon: Icons.upload_rounded,
+              title: l10n.importData,
+              subtitle: 'Restore data from a JSON file',
               onTap: () => backupService.importData(context),
             ),
-            ListTile(
-              leading: const Icon(Icons.table_chart, color: Colors.green),
-              title: Text(l10n.exportToExcel),
-              subtitle: const Text('Export products and sales to Excel'),
+            _SettingsTile(
+              icon: Icons.table_chart_rounded,
+              title: l10n.exportToExcel,
+              subtitle: 'Export products and sales to Excel',
               onTap: () => backupService.exportToExcel(context),
             ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.delete_forever, color: AppTheme.errorColor),
-              title: Text(
-                l10n.resetData,
-                style: const TextStyle(color: AppTheme.errorColor),
-              ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(color: AppTheme.borderColor),
+            ),
+            _SettingsTile(
+              icon: Icons.delete_forever_rounded,
+              title: l10n.resetData,
+              titleColor: AppTheme.errorColor,
+              iconColor: AppTheme.errorColor,
               onTap: () => _showResetConfirmation(context, l10n),
             ),
             const SizedBox(height: 32),
@@ -77,7 +83,7 @@ class SettingsScreen extends StatelessWidget {
               child: Text(
                 'Made by Wint Khant Lin',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[400],
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ),
@@ -95,7 +101,7 @@ class SettingsScreen extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
           color: AppTheme.primaryColor,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -108,12 +114,27 @@ class SettingsScreen extends StatelessWidget {
   ) {
     final currentLocale = context.watch<SettingsCubit>().state.locale;
     final isSelected = currentLocale.languageCode == locale.languageCode;
-    return ListTile(
-      title: Text(title),
-      trailing: isSelected
-          ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
-          : null,
+    
+    return TouchableOpacity(
       onTap: () => context.read<SettingsCubit>().setLocale(locale),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle_rounded, color: AppTheme.primaryColor, size: 24),
+          ],
+        ),
+      ),
     );
   }
 
@@ -129,7 +150,7 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -149,6 +170,65 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final Color? titleColor;
+  final Color? iconColor;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.onTap,
+    this.titleColor,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TouchableOpacity(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor ?? AppTheme.textPrimary, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: titleColor ?? AppTheme.textPrimary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle!,
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: AppTheme.borderColor, size: 24),
+          ],
+        ),
       ),
     );
   }

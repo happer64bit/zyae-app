@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
 class ProductListItem extends StatelessWidget {
   final Product product;
@@ -15,16 +16,19 @@ class ProductListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Container(
+    return TouchableOpacity(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.borderColor),
+        ),
+        child: Row(
+          children: [
+            Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
@@ -71,21 +75,21 @@ class ProductListItem extends StatelessWidget {
                           _buildStatusTag(
                             'Low stock',
                             AppTheme.warningColor,
-                            AppTheme.warningBg,
+                            AppTheme.warningColor.withValues(alpha: 0.1),
                             Icons.warning_amber_rounded,
                           )
                         else if (product.isOutOfStock)
                           _buildStatusTag(
                             'Out of stock',
                             AppTheme.errorColor,
-                            AppTheme.errorBg,
+                            AppTheme.errorColor.withValues(alpha: 0.1),
                             Icons.error_outline,
                           )
                         else if (product.isInStock)
                            _buildStatusTag(
                             'In stock',
                             AppTheme.successColor,
-                            AppTheme.successBg,
+                            AppTheme.successColor.withValues(alpha: 0.1),
                             Icons.check_circle_outline,
                           ),
                       ],
@@ -108,7 +112,6 @@ class ProductListItem extends StatelessWidget {
               const SizedBox(width: 8),
               const Icon(Icons.chevron_right, color: Colors.grey),
             ],
-          ),
         ),
       ),
     );
@@ -118,8 +121,9 @@ class ProductListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

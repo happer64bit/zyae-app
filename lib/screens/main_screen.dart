@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/theme/app_theme.dart';
+import 'package:zyae/widgets/touchable_opacity.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainScreen({
@@ -13,58 +14,66 @@ class MainScreen extends StatefulWidget {
     required this.navigationShell,
   });
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkFirstLaunch();
-    });
+  void _onItemTapped(int index) {
+    HapticFeedback.selectionClick();
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
-  void _checkFirstLaunch() {
-    final settingsCubit = context.read<SettingsCubit>();
-    if (settingsCubit.state.isFirstLaunch) {
-      _showLanguagePicker(settingsCubit);
-    }
-  }
-
-  void _showLanguagePicker(SettingsCubit settingsCubit) {
-    // Note: l10n is not available here as context is not yet fully initialized with locale
-    // during post frame callback if using basic setup, but standard AppLocalizations.of(context)
-    // should work if MaterialApp is set up correctly.
-    // However, for a language picker, showing native names is preferred.
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          title: Text(l10n.selectLanguage),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+    final currentIndex = navigationShell.currentIndex;
+
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return Scaffold(
+      body: SafeArea(child: navigationShell),
+      bottomNavigationBar: Container(
+        height: 70 + bottomPadding,
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          border: const Border(top: BorderSide(color: AppTheme.borderColor)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ListTile(
-                title: Text(l10n.english),
-                onTap: () {
-                  settingsCubit.setLocale(const Locale('en'));
-                  settingsCubit.completeFirstLaunch();
-                  Navigator.pop(context);
-                },
+              _NavBarItem(
+                icon: LucideIcons.house,
+                label: l10n.home,
+                isSelected: currentIndex == 0,
+                onTap: () => _onItemTapped(0),
               ),
-              ListTile(
-                title: Text(l10n.burmese),
-                onTap: () {
-                  settingsCubit.setLocale(const Locale('my'));
-                  settingsCubit.completeFirstLaunch();
-                  Navigator.pop(context);
-                },
+
+              _NavBarItem(
+                icon: LucideIcons.box,
+                label: l10n.inventory,
+                isSelected: currentIndex == 1,
+                onTap: () => _onItemTapped(1),
+              ),
+
+              _MiddleActionButton(
+                isSelected: currentIndex == 2,
+                onTap: () => _onItemTapped(2),
+              ),
+
+              // 4. Sales
+              _NavBarItem(
+                icon: LucideIcons.receipt,
+                label: l10n.sales,
+                isSelected: currentIndex == 3,
+                onTap: () => _onItemTapped(3),
+              ),
+
+              _NavBarItem(
+                icon: LucideIcons.settings,
+                label: l10n.settings,
+                isSelected: currentIndex == 4,
+                onTap: () => _onItemTapped(4),
               ),
             ],
           ),
@@ -72,84 +81,93 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+}
 
-  void _onItemTapped(int index) {
-    widget.navigationShell.goBranch(
-      index,
-      initialLocation: index == widget.navigationShell.currentIndex,
-    );
-  }
+/// A standard navigation item with animations and Burmese-safe text
+class _NavBarItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavBarItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final color = isSelected ? AppTheme.primaryColor : AppTheme.textSecondary;
+    
+    return TouchableOpacity(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 2),
+          // Using flexible text to handle Burmese height
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: color,
+              fontFamily: 'Pyidaungsu', // Ensure you have a font that supports Burmese well
+              height: 1.2, // Fixes clipping for Burmese characters
+            ),
+            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-    return Scaffold(
-      body: widget.navigationShell,
-      bottomNavigationBar: Container(
+/// The distinctive middle button
+class _MiddleActionButton extends StatelessWidget {
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MiddleActionButton({
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TouchableOpacity(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          color: AppTheme.primaryColor,
+          shape: BoxShape.circle,
         ),
-        child: BottomNavigationBar(
-          currentIndex: widget.navigationShell.currentIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppTheme.primaryColor,
-          unselectedItemColor: Colors.grey,
-          showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-          elevation: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.home_outlined),
-              activeIcon: const Icon(Icons.home),
-              label: l10n.home,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.inventory_2_outlined),
-              activeIcon: const Icon(Icons.inventory_2),
-              label: l10n.inventory,
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.white,
-                ),
-              ),
-              label: l10n.sell,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.receipt_long_outlined),
-              activeIcon: const Icon(Icons.receipt_long),
-              label: l10n.sales,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.settings_outlined),
-              activeIcon: const Icon(Icons.settings),
-              label: l10n.settings,
-            ),
-          ],
+        child: Center(
+          child: Icon(
+            LucideIcons.shoppingBasket,
+            color: AppTheme.surfaceColor,
+            // Scale up slightly when selected
+            size: isSelected ? 26 : 22,
+          ),
         ),
       ),
     );
