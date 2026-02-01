@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/widgets/touchable_opacity.dart';
@@ -45,7 +46,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                         color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                      child: const Icon(LucideIcons.arrowLeft, color: Colors.white),
                     ),
                   ),
                   const SizedBox(width: 16),

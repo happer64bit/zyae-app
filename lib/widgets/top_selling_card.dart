@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
 
@@ -45,7 +46,7 @@ class TopSellingCard extends StatelessWidget {
               child: product.imagePath == null
                   ? const Center(
                       child: Icon(
-                        Icons.image,
+                        LucideIcons.image,
                         color: AppTheme.textSecondary,
                       ),
                     )

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -17,39 +19,42 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  String _selectedFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  List<Product> _filteredProducts(List<Product> allProducts) {
-    var products = allProducts;
-
-    if (_searchController.text.isNotEmpty) {
-      products = products
-          .where(
-            (p) => p.name
-                .toLowerCase()
-                .contains(_searchController.text.toLowerCase()),
-          )
-          .toList();
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<InventoryCubit>().loadMoreProducts();
     }
+  }
 
-    switch (_selectedFilter) {
-      case 'Low Stock':
-        return products.where((p) => p.isLowStock).toList();
-      case 'Out of Stock':
-        return products.where((p) => p.isOutOfStock).toList();
-      case 'In Stock':
-        return products.where((p) => p.isInStock).toList();
-      case 'All':
-      default:
-        return products;
-    }
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      context.read<InventoryCubit>().loadInventory(searchQuery: query);
+    });
   }
 
   @override
@@ -57,13 +62,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final inventoryState = context.watch<InventoryCubit>().state;
     final l10n = AppLocalizations.of(context)!;
     final products = inventoryState.products;
-    final filtered = _filteredProducts(products);
 
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             return CustomScrollView(
+              controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
@@ -96,7 +101,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               onTap: () {
                                 context.push('/edit-product');
                               },
-                              child: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
+                              child: const Icon(LucideIcons.circlePlus, color: AppTheme.primaryColor, size: 32),
                             ),
                           ],
                         ),
@@ -108,7 +113,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           decoration: InputDecoration(
                             hintText: l10n.searchProducts,
                             hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.7)),
-                            prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
+                            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.textSecondary),
                             filled: true,
                             fillColor: AppTheme.surfaceColor,
                             border: OutlineInputBorder(
@@ -125,7 +130,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                             contentPadding: const EdgeInsets.symmetric(vertical: 0),
                           ),
-                          onChanged: (value) => setState(() {}),
+                          onChanged: _onSearchChanged,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -134,13 +139,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
                           children: [
-                            _buildFilterChip('All', l10n.all),
+                            _buildFilterChip(context, 'All', l10n.all),
                             const SizedBox(width: 8),
-                            _buildFilterChip('Low Stock', l10n.lowStock),
+                            _buildFilterChip(context, 'Low Stock', l10n.lowStock),
                             const SizedBox(width: 8),
-                            _buildFilterChip('Out of Stock', l10n.outOfStock),
+                            _buildFilterChip(context, 'Out of Stock', l10n.outOfStock),
                             const SizedBox(width: 8),
-                            _buildFilterChip('In Stock', l10n.inStock),
+                            _buildFilterChip(context, 'In Stock', l10n.inStock),
                           ],
                         ),
                       ),
@@ -152,7 +157,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final product = filtered[index];
+                        if (index >= products.length) return const SizedBox(height: 80);
+                        final product = products[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: ProductListItem(
@@ -163,7 +169,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ),
                         );
                       },
-                      childCount: filtered.length,
+                      childCount: products.length + 1, // +1 for padding/loader
                     ),
                   )
                 else
@@ -178,7 +184,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final product = filtered[index];
+                          if (index >= products.length) return const SizedBox(height: 80);
+                          final product = products[index];
                           return ProductGridItem(
                             product: product,
                             onTap: () {
@@ -186,7 +193,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             },
                           );
                         },
-                        childCount: filtered.length,
+                        childCount: products.length + 1,
                       ),
                     ),
                   ),
@@ -199,13 +206,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  Widget _buildFilterChip(String key, String label) {
-    final isSelected = _selectedFilter == key;
+  Widget _buildFilterChip(BuildContext context, String key, String label) {
+    final selectedFilter = context.select((InventoryCubit cubit) => cubit.state.filterType);
+    final isSelected = selectedFilter == key;
     return TouchableOpacity(
       onTap: () {
-        setState(() {
-          _selectedFilter = key;
-        });
+        context.read<InventoryCubit>().loadInventory(filterType: key);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

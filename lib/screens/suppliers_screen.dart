@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/suppliers/suppliers_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/supplier.dart';
@@ -48,7 +49,7 @@ class SuppliersScreen extends StatelessWidget {
                               padding: const EdgeInsets.only(right: 8.0),
                               child: TouchableOpacity(
                                 onTap: () => Navigator.pop(context),
-                                child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24),
+                                child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary, size: 24),
                               ),
                             ),
                           Text(
@@ -62,7 +63,7 @@ class SuppliersScreen extends StatelessWidget {
                           const Spacer(),
                           TouchableOpacity(
                             onTap: () => _addSupplier(context),
-                            child: const Icon(Icons.add_circle, color: AppTheme.primaryColor, size: 32),
+                            child: const Icon(LucideIcons.circlePlus, color: AppTheme.primaryColor, size: 32),
                           ),
                         ],
                       ),
@@ -126,7 +127,7 @@ class SuppliersScreen extends StatelessWidget {
                                     ),
                                     TouchableOpacity(
                                       onTap: () => _deleteSupplier(context, supplier),
-                                      child: const Icon(Icons.delete, color: AppTheme.errorColor),
+                                      child: const Icon(LucideIcons.trash2, color: AppTheme.errorColor),
                                     ),
                                   ],
                                 ),

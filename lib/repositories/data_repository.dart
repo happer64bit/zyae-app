@@ -33,6 +33,38 @@ class DataRepository {
     return _productsBox.values.toList();
   }
 
+  List<Product> getProductsPaged({
+    int offset = 0,
+    int limit = 20,
+    String searchQuery = '',
+    String filterType = 'All',
+  }) {
+    if (!_isInitialized) return [];
+    
+    var products = _productsBox.values;
+
+    if (searchQuery.isNotEmpty) {
+      products = products.where((p) => p.name.toLowerCase().contains(searchQuery.toLowerCase()));
+    }
+
+    switch (filterType) {
+      case 'Low Stock':
+        products = products.where((p) => p.isLowStock);
+        break;
+      case 'Out of Stock':
+        products = products.where((p) => p.isOutOfStock);
+        break;
+      case 'In Stock':
+        products = products.where((p) => p.isInStock);
+        break;
+      case 'All':
+      default:
+        break;
+    }
+
+    return products.skip(offset).take(limit).toList();
+  }
+
   Future<void> addProduct(Product product) async {
     await _productsBox.put(product.id, product);
   }
@@ -69,6 +101,13 @@ class DataRepository {
     final salesList = _salesBox.values.toList();
     salesList.sort((a, b) => b.date.compareTo(a.date));
     return salesList;
+  }
+
+  List<Sale> getSalesPaged({int offset = 0, int limit = 20}) {
+    if (!_isInitialized) return [];
+    final salesList = _salesBox.values.toList();
+    salesList.sort((a, b) => b.date.compareTo(a.date));
+    return salesList.skip(offset).take(limit).toList();
   }
 
   Future<void> addSale(Sale sale) async {

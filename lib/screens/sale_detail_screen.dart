@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -25,7 +26,7 @@ class SaleDetailScreen extends StatelessWidget {
         foregroundColor: AppTheme.textPrimary,
         leading: TouchableOpacity(
           onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
         ),
       ),
       body: SafeArea(
@@ -115,7 +116,7 @@ class SaleDetailScreen extends StatelessWidget {
                                 : null,
                           ),
                           child: item.product.imagePath == null
-                              ? const Icon(Icons.image, color: AppTheme.textSecondary)
+                              ? const Icon(LucideIcons.image, color: AppTheme.textSecondary)
                               : null,
                         ),
                         const SizedBox(width: 16),

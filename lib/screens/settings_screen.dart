@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/repositories/data_repository.dart';
@@ -50,19 +51,19 @@ class SettingsScreen extends StatelessWidget {
             ),
             _buildSectionHeader(context, l10n.dataManagement),
             _SettingsTile(
-              icon: Icons.download_rounded,
+              icon: LucideIcons.download,
               title: l10n.exportData,
               subtitle: 'Backup all data to a JSON file',
               onTap: () => backupService.exportData(context),
             ),
             _SettingsTile(
-              icon: Icons.upload_rounded,
+              icon: LucideIcons.upload,
               title: l10n.importData,
               subtitle: 'Restore data from a JSON file',
               onTap: () => backupService.importData(context),
             ),
             _SettingsTile(
-              icon: Icons.table_chart_rounded,
+              icon: LucideIcons.sheet,
               title: l10n.exportToExcel,
               subtitle: 'Export products and sales to Excel',
               onTap: () => backupService.exportToExcel(context),
@@ -72,7 +73,7 @@ class SettingsScreen extends StatelessWidget {
               child: Divider(color: AppTheme.borderColor),
             ),
             _SettingsTile(
-              icon: Icons.delete_forever_rounded,
+              icon: LucideIcons.trash2,
               title: l10n.resetData,
               titleColor: AppTheme.errorColor,
               iconColor: AppTheme.errorColor,
@@ -131,7 +132,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: AppTheme.primaryColor, size: 24),
+              const Icon(LucideIcons.circleCheck, color: AppTheme.primaryColor, size: 24),
           ],
         ),
       ),
@@ -226,7 +227,7 @@ class _SettingsTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.borderColor, size: 24),
+            const Icon(LucideIcons.chevronRight, color: AppTheme.borderColor, size: 24),
           ],
         ),
       ),

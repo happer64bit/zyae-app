@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/cubits/suppliers/suppliers_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
@@ -154,7 +155,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.add_circle, color: AppTheme.primaryColor),
+                            icon: const Icon(LucideIcons.circlePlus, color: AppTheme.primaryColor),
                             onPressed: () async {
                               final cubit = context.read<SuppliersCubit>();
                               final newSupplier = await Navigator.push(
@@ -284,7 +285,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 children: [
                   TouchableOpacity(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24),
+                    child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary, size: 24),
                   ),
                   Expanded(
                     child: Text(
@@ -321,7 +322,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           ),
                         );
                       },
-                      child: const Icon(Icons.delete_outline, color: AppTheme.errorColor, size: 24),
+                      child: const Icon(LucideIcons.trash2, color: AppTheme.errorColor, size: 24),
                     )
                   else
                     const SizedBox(width: 48), // Placeholder to balance the title centering
@@ -346,7 +347,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   child: _imagePath == null
                       ? const Icon(
-                          Icons.add_a_photo,
+                          LucideIcons.camera,
                           size: 40,
                           color: AppTheme.textSecondary,
                         )
@@ -376,7 +377,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       color: AppTheme.primaryColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.qr_code_scanner, color: Colors.white),
+                    child: const Icon(LucideIcons.scanLine, color: Colors.white),
                   ),
                 ),
               ],
@@ -487,7 +488,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 20, color: Colors.grey[600]),
+                    Icon(LucideIcons.calendar, size: 20, color: Colors.grey[600]),
                     const SizedBox(width: 12),
                     Text(
                       _expiryDate != null
@@ -525,7 +526,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.save_outlined, color: Colors.white),
+                    const Icon(LucideIcons.save, color: Colors.white),
                     const SizedBox(width: 8),
                     Text(
                       widget.isNew ? l10n.addProduct : l10n.update,

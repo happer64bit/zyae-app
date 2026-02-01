@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/models/sale.dart';
 import 'package:zyae/screens/sale_detail_screen.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -40,7 +41,7 @@ class SaleListItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.receipt_long,
+            const Icon(LucideIcons.receipt,
                 color: AppTheme.textPrimary, size: 24),
             const SizedBox(width: 16),
             Expanded(

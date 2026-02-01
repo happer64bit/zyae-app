@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,35 @@ class SalesScreen extends StatefulWidget {
 class _SalesScreenState extends State<SalesScreen> {
   DateTimeRange? _selectedDateRange;
   bool _sortAscending = false;
+  final ScrollController _scrollController = ScrollController();
+  int _visibleCount = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      setState(() {
+        _visibleCount += 20;
+      });
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   List<Sale> _getFilteredSales(List<Sale> sales) {
     var filtered = List<Sale>.from(sales);
@@ -70,9 +100,12 @@ class _SalesScreenState extends State<SalesScreen> {
   @override
   Widget build(BuildContext context) {
     final salesState = context.watch<SalesCubit>().state;
-    final sales = salesState.sales;
+    final sales = salesState.allSalesForStats.isNotEmpty ? salesState.allSalesForStats : salesState.sales;
     final filteredSales = _getFilteredSales(sales);
     final l10n = AppLocalizations.of(context)!;
+    
+    // Only show visible count
+    final displaySales = filteredSales.take(_visibleCount).toList();
 
     final stats = _SalesStatistics.calculate(sales);
     final chartData = _ChartData.calculate(sales, stats.maxY);
@@ -85,7 +118,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.analytics_outlined, size: 64, color: AppTheme.textSecondary),
+                    const Icon(LucideIcons.trendingUp, size: 64, color: AppTheme.textSecondary),
                     const SizedBox(height: 16),
                     Text(
                       '${l10n.noSalesYet}\n${l10n.startNewSale}',
@@ -96,6 +129,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 ),
               )
             : CustomScrollView(
+                controller: _scrollController,
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.all(16.0),
@@ -125,7 +159,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.today,
                                     value: '${NumberFormat("#,##0").format(stats.todayTotal)} MMK',
-                                    icon: Icons.today,
+                                    icon: LucideIcons.calendar,
                                     iconColor: AppTheme.textPrimary,
                                     subtitle: '${stats.todayOrders} ${l10n.orders}',
                                   ),
@@ -135,7 +169,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.thisWeek,
                                     value: '${NumberFormat("#,##0").format(stats.weekTotal)} MMK',
-                                    icon: Icons.calendar_view_week,
+                                    icon: LucideIcons.calendarRange,
                                     iconColor: AppTheme.textPrimary,
                                   ),
                                 ),
@@ -144,7 +178,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: l10n.thisMonth,
                                     value: '${NumberFormat("#,##0").format(stats.monthTotal)} MMK',
-                                    icon: Icons.calendar_month,
+                                    icon: LucideIcons.calendarDays,
                                     iconColor: AppTheme.textPrimary,
                                   ),
                                 ),
@@ -153,7 +187,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                   child: StatCard(
                                     title: 'Avg. Order', // Consider adding to l10n
                                     value: '${NumberFormat("#,##0").format(stats.avgOrderValue)} MMK',
-                                    icon: Icons.pie_chart_outline,
+                                    icon: LucideIcons.circleDollarSign,
                                     iconColor: AppTheme.textPrimary,
                                   ),
                                 ),
@@ -403,7 +437,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    Icons.calendar_month_outlined,
+                                    LucideIcons.calendar,
                                     color: _selectedDateRange != null ? AppTheme.primaryColor : AppTheme.textSecondary,
                                   ),
                                   onPressed: _pickDateRange,
@@ -411,7 +445,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                 ),
                                 if (_selectedDateRange != null)
                                   IconButton(
-                                    icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                                    icon: const Icon(LucideIcons.x, color: AppTheme.textSecondary),
                                     onPressed: () {
                                       setState(() {
                                         _selectedDateRange = null;
@@ -446,10 +480,15 @@ class _SalesScreenState extends State<SalesScreen> {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            final sale = filteredSales[index];
+                            if (index >= displaySales.length) {
+                              return filteredSales.length > displaySales.length 
+                                  ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator())) 
+                                  : const SizedBox();
+                            }
+                            final sale = displaySales[index];
                             return SaleListItem(sale: sale);
                           },
-                          childCount: _selectedDateRange != null ? filteredSales.length : filteredSales.take(10).length,
+                          childCount: displaySales.length + (filteredSales.length > displaySales.length ? 1 : 0),
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/l10n/generated/app_localizations.dart';
 import 'package:zyae/models/supplier.dart';
 import 'package:zyae/theme/app_theme.dart';
@@ -60,7 +61,7 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: TouchableOpacity(
                           onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24),
+                          child: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary, size: 24),
                         ),
                       ),
                     Text(
@@ -76,7 +77,7 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
                       onTap: _save,
                       child: Container(
                         padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.save, color: AppTheme.primaryColor, size: 24),
+                        child: const Icon(LucideIcons.save, color: AppTheme.primaryColor, size: 24),
                       ),
                     ),
                   ],
@@ -89,7 +90,7 @@ class _EditSupplierScreenState extends State<EditSupplierScreen> {
                     backgroundColor: AppTheme.surfaceColor,
                     backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
                     child: _imagePath == null 
-                      ? const Icon(Icons.add_a_photo, size: 40, color: AppTheme.textSecondary) 
+                      ? const Icon(LucideIcons.camera, size: 40, color: AppTheme.textSecondary) 
                       : null,
                   ),
                 ),

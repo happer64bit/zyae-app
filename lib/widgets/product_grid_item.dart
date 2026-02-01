@@ -18,7 +18,12 @@ class ProductGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return TouchableOpacity(
       onTap: onTap,
-      child: Card(
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.borderColor),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -31,7 +36,10 @@ class ProductGridItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       image: DecorationImage(
-                        image: FileImage(File(product.imagePath!)),
+                        image: ResizeImage(
+                          FileImage(File(product.imagePath!)),
+                          width: 300, // Optimize memory usage
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),

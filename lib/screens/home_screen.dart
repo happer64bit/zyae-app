@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/cubits/inventory/inventory_cubit.dart';
 import 'package:zyae/cubits/sales/sales_cubit.dart';
 import 'package:zyae/cubits/settings/settings_cubit.dart';
@@ -50,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                         child: StatCard(
                           title: l10n.todaysSales,
                           value: '${NumberFormat("#,##0").format(stats.todaysSales)} MMK',
-                          icon: Icons.attach_money_rounded,
+                          icon: LucideIcons.dollarSign,
                           iconColor: AppTheme.textPrimary,
                           onTap: () => context.go('/sales'),
                         ),
@@ -60,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                         child: StatCard(
                           title: l10n.transactions,
                           value: NumberFormat.decimalPattern().format(stats.todaysTransactions),
-                          icon: Icons.receipt_long_rounded,
+                          icon: LucideIcons.receipt,
                           iconColor: AppTheme.textPrimary,
                           onTap: () => context.go('/sales'),
                         ),
@@ -86,25 +87,25 @@ class HomeScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 _QuickActionItem(
                   label: l10n.newSale,
-                  icon: Icons.add_shopping_cart_rounded,
+                  icon: LucideIcons.shoppingCart,
                   color: AppTheme.primaryColor,
                   onTap: () => context.go('/sell'),
                 ),
                 _QuickActionItem(
                   label: l10n.addItem,
-                  icon: Icons.add_box_rounded,
+                  icon: LucideIcons.packagePlus,
                   color: AppTheme.successColor,
                   onTap: () => context.push('/edit-product'),
                 ),
                 _QuickActionItem(
                   label: l10n.inventory,
-                  icon: Icons.inventory_2_rounded,
+                  icon: LucideIcons.package,
                   color: AppTheme.warningColor,
                   onTap: () => context.go('/inventory'),
                 ),
                 _QuickActionItem(
                   label: l10n.summary,
-                  icon: Icons.bar_chart_rounded,
+                  icon: LucideIcons.chartArea,
                   color: AppTheme.secondaryColor,
                   onTap: () => context.go('/sales'),
                 ),
@@ -164,7 +165,7 @@ class HomeScreen extends StatelessWidget {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(Icons.receipt_long_rounded, size: 48, color: AppTheme.textSecondary.withValues(alpha: 0.5)),
+                      Icon(LucideIcons.receipt, size: 48, color: AppTheme.textSecondary.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noSalesFound,
@@ -207,7 +208,7 @@ class HomeScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
-                                Icons.warning_rounded,
+                                LucideIcons.triangleAlert,
                                 color: AppTheme.errorColor,
                                 size: 20,
                               ),
@@ -262,7 +263,7 @@ class HomeScreen extends StatelessWidget {
             color: AppTheme.primaryColor,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Icon(Icons.add_shopping_cart_rounded, color: Colors.white, size: 28),
+          child: const Icon(LucideIcons.shoppingCart, color: Colors.white, size: 28),
         ),
       ),
     );
@@ -326,7 +327,7 @@ class HomeScreen extends StatelessWidget {
           onTap: () => context.push('/settings'),
           child: const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Icon(Icons.settings_outlined, color: AppTheme.textPrimary, size: 24),
+            child: Icon(LucideIcons.settings, color: AppTheme.textPrimary, size: 24),
           ),
         ),
         const SizedBox(width: 8),

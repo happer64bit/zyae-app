@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:zyae/models/product.dart';
 import 'package:zyae/theme/app_theme.dart';
 import 'package:zyae/widgets/touchable_opacity.dart';
@@ -36,13 +37,16 @@ class ProductListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   image: product.imagePath != null
                       ? DecorationImage(
-                          image: FileImage(File(product.imagePath!)),
+                          image: ResizeImage(
+                            FileImage(File(product.imagePath!)),
+                            width: 100, // Optimize memory usage
+                          ),
                           fit: BoxFit.cover,
                         )
                       : null,
                 ),
                 child: product.imagePath == null
-                    ? const Icon(Icons.inventory_2_outlined, color: Colors.grey)
+                    ? const Icon(LucideIcons.package, color: Colors.grey)
                     : null,
               ),
               const SizedBox(width: 16),
@@ -76,21 +80,21 @@ class ProductListItem extends StatelessWidget {
                             'Low stock',
                             AppTheme.warningColor,
                             AppTheme.warningColor.withValues(alpha: 0.1),
-                            Icons.warning_amber_rounded,
+                            LucideIcons.triangleAlert,
                           )
                         else if (product.isOutOfStock)
                           _buildStatusTag(
                             'Out of stock',
                             AppTheme.errorColor,
                             AppTheme.errorColor.withValues(alpha: 0.1),
-                            Icons.error_outline,
+                            LucideIcons.circleAlert,
                           )
                         else if (product.isInStock)
                            _buildStatusTag(
                             'In stock',
                             AppTheme.successColor,
                             AppTheme.successColor.withValues(alpha: 0.1),
-                            Icons.check_circle_outline,
+                            LucideIcons.circleCheck,
                           ),
                       ],
                     ),
@@ -110,7 +114,7 @@ class ProductListItem extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              const Icon(LucideIcons.chevronRight, color: Colors.grey),
             ],
         ),
       ),
